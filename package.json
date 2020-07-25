@@ -21,6 +21,7 @@
     "typescript": "^3.9.7"
   },
   "dependencies": {
-    "jss": "^10.3.0"
+    "jss": "^10.3.0",
+    "jss-preset-default": "^10.3.0"
   }
 }
