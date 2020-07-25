@@ -1,0 +1,23 @@
+{
+  "name": "tsnodes",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/michalmarchewczyk/TSNodes.git"
+  },
+  "author": "Michał Marchewczyk",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/michalmarchewczyk/TSNodes/issues"
+  },
+  "homepage": "https://github.com/michalmarchewczyk/TSNodes#readme",
+  "devDependencies": {
+    "typescript": "^3.9.7"
+  }
+}
