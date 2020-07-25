@@ -19,5 +19,8 @@
   "homepage": "https://github.com/michalmarchewczyk/TSNodes#readme",
   "devDependencies": {
     "typescript": "^3.9.7"
+  },
+  "dependencies": {
+    "jss": "^10.3.0"
   }
 }
