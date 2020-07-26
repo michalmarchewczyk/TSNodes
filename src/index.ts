@@ -13,10 +13,10 @@ let TSNodes = {
     Graph: _Graph,
     Editor: _Editor,
     Engine: _Engine,
-    EditorView: _EditorView,
-    EditorGraphs: _EditorGraphs,
-    EditorNodes: _EditorNodes,
-    EditorInfo: _EditorInfo,
+    // EditorView: _EditorView,
+    // EditorGraphs: _EditorGraphs,
+    // EditorNodes: _EditorNodes,
+    // EditorInfo: _EditorInfo,
 }
 
 export default TSNodes;
