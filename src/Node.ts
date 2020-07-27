@@ -18,6 +18,7 @@ interface _NodeBox {
     collapsed:boolean;
     selected:boolean;
     active:boolean;
+    zIndex:number;
 }
 
 const styles = {
@@ -27,6 +28,16 @@ const styles = {
         background: '#777777',
         outline: '1px solid blue',
         minHeight: '80px',
+        '&.nodeCollapsed': {
+            maxHeight: '30px',
+            minHeight: '30px',
+            '& $name button': {
+                borderStyle: 'solid',
+                borderWidth: '6px 0 6px 10px',
+                borderColor: 'transparent transparent transparent white',
+                top: '-4px',
+            }
+        }
     },
     handleLeft: {
         display: 'block',
@@ -57,6 +68,21 @@ const styles = {
         height: 20,
         background: '#555555',
         color: 'white',
+        cursor: 'default',
+        '& button': {
+            display: 'inline-block',
+            position: 'relative',
+            width: 0,
+            height: 0,
+            outline: 'none',
+            background: 'transparent',
+            padding: '0',
+            borderStyle: 'solid',
+            borderWidth: '10px 6px 0 6px',
+            borderColor: 'white transparent transparent transparent',
+            margin: '4px',
+            top: 0,
+        }
     }
 }
 
@@ -73,6 +99,7 @@ abstract class _Node {
         collapsed: false,
         selected: false,
         active: false,
+        zIndex: 0,
     };
     public element:HTMLElement;
     public moving:boolean = false;
@@ -93,15 +120,14 @@ abstract class _Node {
         let rightHandle = document.createElement('div');
         rightHandle.className = classes.handleRight;
         this.element.appendChild(rightHandle);
-        let name = document.createElement('div');
-        name.className = classes.name;
-        name.innerHTML = this.name;
-        this.element.appendChild(name);
         this.setupNodeControls();
     }
 
     private setupNodeControls():void {
         this.element.onmousedown = (e) => {
+            this.nodeBox.zIndex = this.editor.view.zIndex + 1;
+            this.editor.view.zIndex += 1;
+            this.element.style.zIndex = this.nodeBox.zIndex.toString();
             if (e.button !== 0) return;
             let clientX:number;
             let clientY:number;
@@ -169,6 +195,21 @@ abstract class _Node {
             }
             this.editor.view.container.onmouseleave = this.editor.view.container.onmouseup;
         }
+        let name = document.createElement('div');
+        name.className = classes.name;
+        name.innerHTML = `<button></button><span>${this.name}</span>`;
+        (<HTMLElement>name.children[0]).onclick = (e) => {
+            if(this.nodeBox.collapsed){
+                console.log('expand');
+                this.nodeBox.collapsed = false;
+                this.element.classList.remove('nodeCollapsed');
+            }else{
+                console.log('collapse');
+                this.nodeBox.collapsed = true;
+                this.element.classList.add('nodeCollapsed');
+            }
+        }
+        this.element.appendChild(name);
     }
 
     addInput(input:_Input<any>) {
@@ -184,10 +225,10 @@ abstract class _Node {
     }
 
     render():HTMLElement {
-        console.log(this.nodeBox.pos);
         this.element.style.left = this.nodeBox.pos[0] + 'px';
         this.element.style.top = this.nodeBox.pos[1] + 'px';
         this.element.style.width = this.nodeBox.width + 'px';
+        this.element.style.zIndex = this.nodeBox.zIndex.toString();
         return this.element;
     }
 }

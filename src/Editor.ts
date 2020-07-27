@@ -36,6 +36,7 @@ const styles = {
         backgroundSize: '20px 20px, 20px 20px, 80px 80px, 80px 80px',
         transform: 'scale(1)',
         transformOrigin: 'top left',
+        overflow: 'hidden',
     },
     background: {
         display: 'block',
@@ -57,6 +58,7 @@ const styles = {
         width: '100%',
         height: '40px',
         outline: '1px solid red',
+        cursor: 'pointer',
     },
     graphElement: {
         display: 'block',
@@ -66,6 +68,9 @@ const styles = {
         width: '100%',
         height: '40px',
         outline: '1px solid red',
+        '&.graphSelected': {
+            fontWeight: 'bold',
+        }
     }
 }
 
@@ -221,10 +226,27 @@ class _EditorGraphs {
 
     addGraph(graph:_Graph) {
         this.graphs.push(graph);
+        let graphElement = this.renderGraphElement(graph)
+        this.container.appendChild(graphElement);
+        this.editor.selectGraph(graph);
+        Array.from(this.container.children).forEach(child => {
+            child.classList.remove('graphSelected');
+        })
+        graphElement.classList.add('graphSelected');
+    }
+
+    renderGraphElement(graph:_Graph):HTMLElement {
         let graphElement = document.createElement('div');
         graphElement.className = classes.graphElement;
         graphElement.innerText = graph.name;
-        this.container.appendChild(graphElement);
+        graphElement.onclick = (e) => {
+            this.editor.selectGraph(graph);
+            Array.from(this.container.children).forEach(child => {
+                child.classList.remove('graphSelected');
+            })
+            graphElement.classList.add('graphSelected');
+        }
+        return graphElement;
     }
 
     render():HTMLElement {
@@ -262,6 +284,9 @@ class _EditorNodes {
                 (this.editor?.view.scrollX || 0) / (this.editor?.view.zoom || 0) + 200,
                 (this.editor?.view.scrollY || 0) / (this.editor?.view.zoom || 0) + 200
             ];
+            newNode.nodeBox.zIndex = this.editor.view.zIndex+1;
+            this.editor.view.zIndex += 1;
+            newNode.element.style.zIndex = newNode.nodeBox.zIndex.toString();
             this.editor?.createNode(newNode);
         }
 
@@ -310,7 +335,13 @@ class _Editor {
     createGraph(name:string) {
         let graph = new _Graph(name);
         this.graphs?.addGraph(graph);
+        this.selectGraph(graph);
+    }
+
+    selectGraph(graph:_Graph) {
         this.view.selectGraph(graph);
+        console.log('select');
+
     }
 
     createNode(node:_Node):void {
