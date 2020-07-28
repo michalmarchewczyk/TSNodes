@@ -42,7 +42,7 @@ const styles = {
     fieldElement: {
         display: 'flex',
         position: 'absolute',
-        width: 'calc(100% - 12px)',
+        width: 'calc(100% - 16px)',
         height: '100%',
         overflow: 'hidden',
         '& span': {
@@ -59,12 +59,14 @@ const styles = {
             position: 'relative',
             flex: '1 1 20px',
             minWidth: 20,
+            outline: 'none',
+            border: 'none',
         }
     },
     fieldElementNumber: {
         display: 'inline-block',
         position: 'absolute',
-        width: 'calc(100% - 14px)',
+        width: 'calc(100% - 18px)',
         height: '100%',
         overflow: 'hidden',
         '& div': {
@@ -106,6 +108,7 @@ const styles = {
                 flex: '1 1 20px',
                 minWidth: 20,
                 border: 'none',
+                outline: 'none',
             },
             '& button:last-child': {
                 flex: '0 0 20px',
@@ -126,7 +129,7 @@ const styles = {
     fieldElementBoolean: {
         display: 'flex',
         position: 'absolute',
-        width: 'calc(100% - 12px)',
+        width: 'calc(100% - 16px)',
         height: '100%',
         overflow: 'hidden',
         '& span': {
@@ -153,27 +156,31 @@ const {classes} = jss.createStyleSheet(styles).attach();
 class _Input<T> {
     public name:string;
     public value:T;
-    private defaultValue:T;
+    public defaultValue:T;
     public element:HTMLElement;
     private elementField:boolean;
+    private socket:boolean;
 
-    constructor(name:string, defaultValue:T, elementField?:boolean) {
+    constructor(name:string, defaultValue:T, elementField?:boolean, socket?:boolean) {
         this.name = name;
         this.defaultValue = defaultValue;
         this.value = defaultValue;
         this.element = document.createElement('div');
         this.elementField = elementField ?? true;
+        this.socket = socket ?? true;
         this.setupElement();
     }
 
     setupElement() {
         this.element.className = classes.inputElement;
-        let snap = document.createElement('div');
-        snap.className = classes.snap;
-        let dot = document.createElement('div');
-        dot.className = classes.dot;
-        snap.appendChild(dot);
-        this.element.appendChild(snap);
+        if(this.socket){
+            let snap = document.createElement('div');
+            snap.className = classes.snap;
+            let dot = document.createElement('div');
+            dot.className = classes.dot;
+            snap.appendChild(dot);
+            this.element.appendChild(snap);
+        }
         if (this.elementField) {
             this.element.appendChild(this.renderField());
         } else {
@@ -190,6 +197,14 @@ class _Input<T> {
         (<HTMLElement>fieldElement.children[1]).onmousedown = (e) => {
             e.stopPropagation();
             if (e.button !== 0) e.preventDefault();
+            if (e.button === 1) {
+                this.value = this.defaultValue;
+                (<HTMLInputElement>fieldElement.children[1]).value = <any>this.value;
+            }
+        }
+        (<HTMLInputElement>fieldElement.children[1]).onchange = (e) => {
+            this.value = <any>(<HTMLInputElement>fieldElement.children[0].children[2]).value;
+            (<HTMLInputElement>fieldElement.children[1]).value = <any>this.value;
         }
         return fieldElement;
     }
@@ -204,8 +219,8 @@ class _InputNumber extends _Input<number> {
     public min:number;
     public max:number;
 
-    constructor(name:string, defaultValue:number = 0, min:number = 0, max:number = 100, elementField?:boolean) {
-        super(name, defaultValue, elementField);
+    constructor(name:string, defaultValue:number = 0, min:number = 0, max:number = 100, elementField?:boolean, socket?:boolean) {
+        super(name, defaultValue, elementField, socket);
         this.min = min;
         this.max = max;
     }
@@ -216,9 +231,30 @@ class _InputNumber extends _Input<number> {
         fieldElement.innerHTML = `<div>
             <button></button>
             <span>${this.name}</span>
-            <input type='number'>
+            <input type='number' value='${this.value}' min='${this.min}' max='${this.max}'>
             <button></button>
-            </div>`
+            </div>`;
+        (<HTMLElement>fieldElement.children[0].children[2]).onmousedown = (e) => {
+            e.stopPropagation();
+            if (e.button !== 0) e.preventDefault();
+            if (e.button === 1) {
+                this.value = this.defaultValue;
+                (<HTMLInputElement>fieldElement.children[0].children[2]).value = this.value.toString();
+            }
+        }
+        (<HTMLInputElement>fieldElement.children[0].children[2]).onchange = (e) => {
+            this.value = parseInt((<HTMLInputElement>fieldElement.children[0].children[2]).value);
+            this.value = Math.max(this.min, Math.min(this.max, this.value));
+            (<HTMLInputElement>fieldElement.children[0].children[2]).value = this.value.toString();
+        }
+        (<HTMLElement>fieldElement.children[0].children[0]).onmousedown = (e) => {
+            this.value = Math.max(this.min, Math.min(this.max, this.value-1));
+            (<HTMLInputElement>fieldElement.children[0].children[2]).value = this.value.toString();
+        }
+        (<HTMLElement>fieldElement.children[0].children[3]).onmousedown = (e) => {
+            this.value = Math.max(this.min, Math.min(this.max, this.value+1));
+            (<HTMLInputElement>fieldElement.children[0].children[2]).value = this.value.toString();
+        }
         return fieldElement;
     }
 }
@@ -229,8 +265,8 @@ class _InputFloat extends _Input<number> {
     public max:number;
     public step:number;
 
-    constructor(name:string, defaultValue:number = 0, min:number = 0, max:number = 1, step:number = 0.1, elementField?:boolean) {
-        super(name, defaultValue, elementField);
+    constructor(name:string, defaultValue:number = 0, min:number = 0, max:number = 1, step:number = 0.1, elementField?:boolean, socket?:boolean) {
+        super(name, defaultValue, elementField, socket);
         this.min = min;
         this.max = max;
         this.step = step;
@@ -242,9 +278,37 @@ class _InputFloat extends _Input<number> {
         fieldElement.innerHTML = `<div>
             <button></button>
             <span>${this.name}</span>
-            <input type='number'>
+            <input type='number' value='${this.value}' min='${this.min}' max='${this.max}'>
             <button></button>
-            </div>`
+            </div>`;
+        (<HTMLElement>fieldElement.children[0].children[2]).onmousedown = (e) => {
+            e.stopPropagation();
+            if (e.button !== 0) e.preventDefault();
+        }
+        (<HTMLElement>fieldElement.children[0].children[2]).onmousedown = (e) => {
+            e.stopPropagation();
+            if (e.button !== 0) e.preventDefault();
+            if (e.button === 1) {
+                this.value = this.defaultValue;
+                (<HTMLInputElement>fieldElement.children[0].children[2]).value = this.value.toString();
+            }
+        }
+        (<HTMLInputElement>fieldElement.children[0].children[2]).onchange = (e) => {
+            this.value = parseFloat((<HTMLInputElement>fieldElement.children[0].children[2]).value);
+            this.value = Math.max(this.min, Math.min(this.max, this.value));
+            this.value = Math.round(this.value * 1000000) / 1000000;
+            (<HTMLInputElement>fieldElement.children[0].children[2]).value = this.value.toString();
+        }
+        (<HTMLElement>fieldElement.children[0].children[0]).onmousedown = (e) => {
+            this.value = Math.max(this.min, Math.min(this.max, this.value-this.step));
+            this.value = Math.round(this.value * 1000000) / 1000000;
+            (<HTMLInputElement>fieldElement.children[0].children[2]).value = this.value.toString();
+        }
+        (<HTMLElement>fieldElement.children[0].children[3]).onmousedown = (e) => {
+            this.value = Math.max(this.min, Math.min(this.max, this.value+this.step));
+            this.value = Math.round(this.value * 1000000) / 1000000;
+            (<HTMLInputElement>fieldElement.children[0].children[2]).value = this.value.toString();
+        }
         return fieldElement;
     }
 }
@@ -252,8 +316,8 @@ class _InputFloat extends _Input<number> {
 
 class _InputBoolean extends _Input<boolean> {
 
-    constructor(name:string, defaultValue:boolean = false, elementField?:boolean) {
-        super(name, defaultValue, elementField);
+    constructor(name:string, defaultValue:boolean = false, elementField?:boolean, socket?:boolean) {
+        super(name, defaultValue, elementField, socket);
     }
 
     renderField():HTMLElement {
@@ -261,16 +325,29 @@ class _InputBoolean extends _Input<boolean> {
         fieldElement.className = classes.fieldElementBoolean;
         fieldElement.innerHTML = `
         <span>${this.name}</span>
-        <input type='checkbox'>
-        `
+        <input type='checkbox' ${this.value? 'checked' : ''}>
+        `;
+        (<HTMLInputElement>fieldElement.children[1]).onchange = (e) => {
+            this.value = (<HTMLInputElement>fieldElement.children[1]).checked;
+            (<HTMLInputElement>fieldElement.children[1]).checked = this.value;
+        }
+        (<HTMLElement>fieldElement.children[1]).onmousedown = (e) => {
+            e.stopPropagation();
+            if (e.button !== 0) e.preventDefault();
+            if (e.button === 1) {
+                this.value = this.defaultValue;
+                console.log(this.value);
+                (<HTMLInputElement>fieldElement.children[1]).checked = this.value;
+            }
+        }
         return fieldElement;
     }
 }
 
 
 class _InputString extends _Input<string> {
-    constructor(name:string, defaultValue:string = '', elementField?:boolean) {
-        super(name, defaultValue, elementField);
+    constructor(name:string, defaultValue:string = '', elementField?:boolean, socket?:boolean) {
+        super(name, defaultValue, elementField, socket);
     }
 }
 

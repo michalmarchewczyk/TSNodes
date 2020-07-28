@@ -157,6 +157,7 @@ abstract class _Node {
             this.nodeBox.zIndex = this.editor.view.zIndex + 1;
             this.editor.view.zIndex += 1;
             this.element.style.zIndex = this.nodeBox.zIndex.toString();
+            e.preventDefault();
             if (e.button !== 0) return;
             let clientX:number;
             let clientY:number;
