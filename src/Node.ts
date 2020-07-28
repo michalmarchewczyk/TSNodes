@@ -8,9 +8,7 @@ import _Editor from './Editor';
 
 jss.setup(preset());
 
-const DEFAULT_WIDTH = 120;
-const MIN_WIDTH = 80;
-const MAX_WIDTH = 1240;
+import config from './config';
 
 interface _NodeBox {
     pos:[number, number];
@@ -26,12 +24,12 @@ const styles = {
         display: 'block',
         position: 'absolute',
         background: '#777777',
-        outline: '1px solid blue',
+        outline: (config.debugOutline) ? '1px solid blue' : 'none',
         minHeight: 40,
         height: 'auto',
         '&.nodeCollapsed': {
-            maxHeight: 22,
-            minHeight: 22,
+            maxHeight: 25,
+            minHeight: 25,
             overflow: 'hidden',
             '& $name button': {
                 borderStyle: 'solid',
@@ -48,7 +46,7 @@ const styles = {
         left: -8,
         width: 16,
         height: 'calc(100% - 20px)',
-        outline: '1px solid green',
+        outline: (config.debugOutline) ? '1px solid green' : 'none',
         cursor: 'ew-resize',
         zIndex: 20,
     },
@@ -59,7 +57,7 @@ const styles = {
         right: -8,
         width: 16,
         height: 'calc(100% - 20px)',
-        outline: '1px solid green',
+        outline: (config.debugOutline) ? '1px solid green' : 'none',
         cursor: 'ew-resize',
         zIndex: 20,
     },
@@ -91,12 +89,12 @@ const styles = {
     nodeContainer: {
         display: 'block',
         position: 'relative',
-        marginTop: 25,
-        marginBottom: 5,
+        marginTop: 30,
+        marginBottom: 8,
         left: 0,
         width: '100%',
         height: 'auto',
-        outline: '2px solid orange',
+        outline: (config.debugOutline) ? '2px solid orange' : 'none',
         zIndex: 30,
     }
 }
@@ -110,7 +108,7 @@ abstract class _Node {
     public connections:_Connection[] = [];
     public nodeBox:_NodeBox = {
         pos: [0, 0],
-        width: DEFAULT_WIDTH,
+        width: config.defaultNodeWidth,
         collapsed: false,
         selected: false,
         active: false,
@@ -140,10 +138,10 @@ abstract class _Node {
         name.className = classes.name;
         name.innerHTML = `<button></button><span>${this.name}</span>`;
         (<HTMLElement>name.children[0]).onclick = (e) => {
-            if(this.nodeBox.collapsed){
+            if (this.nodeBox.collapsed) {
                 this.nodeBox.collapsed = false;
                 this.element.classList.remove('nodeCollapsed');
-            }else{
+            } else {
                 this.nodeBox.collapsed = true;
                 this.element.classList.add('nodeCollapsed');
             }
@@ -194,12 +192,12 @@ abstract class _Node {
             this.editor.view.container.onmousemove = (e) => {
                 let deltaX = clientX ? clientX - e.clientX : 0;
                 let old_width = this.nodeBox.width;
-                this.nodeBox.width = Math.min(MAX_WIDTH, Math.max(MIN_WIDTH, this.nodeBox.width + deltaX / this.editor.view.zoom));
+                this.nodeBox.width = Math.min(config.maxNodeWidth, Math.max(config.minNodeWidth, this.nodeBox.width + deltaX / this.editor.view.zoom));
                 if (old_width !== this.nodeBox.width) {
                     this.nodeBox.pos = [this.nodeBox.pos[0] - deltaX / this.editor.view.zoom, this.nodeBox.pos[1]];
                     this.element.style.left = this.nodeBox.pos[0] + 'px';
                 }
-                if (this.nodeBox.width !== MIN_WIDTH && this.nodeBox.width !== MAX_WIDTH || !clientX) {
+                if (this.nodeBox.width !== config.minNodeWidth && this.nodeBox.width !== config.maxNodeWidth || !clientX) {
                     clientX = e.clientX;
                 }
                 this.element.style.width = this.nodeBox.width + 'px';
@@ -217,8 +215,8 @@ abstract class _Node {
             let clientX:number;
             this.editor.view.container.onmousemove = (e) => {
                 let deltaX = clientX ? e.clientX - clientX : 0;
-                this.nodeBox.width = Math.min(MAX_WIDTH, Math.max(MIN_WIDTH, this.nodeBox.width + deltaX / this.editor.view.zoom));
-                if (this.nodeBox.width !== MIN_WIDTH && this.nodeBox.width !== MAX_WIDTH || !clientX) {
+                this.nodeBox.width = Math.min(config.maxNodeWidth, Math.max(config.minNodeWidth, this.nodeBox.width + deltaX / this.editor.view.zoom));
+                if (this.nodeBox.width !== config.minNodeWidth && this.nodeBox.width !== config.maxNodeWidth || !clientX) {
                     clientX = e.clientX;
                 }
                 this.element.style.width = this.nodeBox.width + 'px';

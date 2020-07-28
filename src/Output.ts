@@ -1,6 +1,7 @@
 
 import jss from 'jss';
 import preset from 'jss-preset-default';
+import config from './config';
 
 
 jss.setup(preset());
@@ -12,7 +13,7 @@ const styles = {
         top: 0,
         left: 0,
         minHeight: 20,
-        outline: '1px solid red',
+        outline: (config.debugOutline) ? '1px solid red' : 'none',
         marginTop: 5,
         marginBottom: 5,
         textAlign: 'right',
@@ -26,7 +27,7 @@ const styles = {
         right: -8,
         width: 16,
         height: 16,
-        outline: '1px solid cyan',
+        outline: (config.debugOutline) ? '1px solid cyan' : 'none',
     },
     dot: {
         display: 'block',

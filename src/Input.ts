@@ -1,5 +1,6 @@
 import jss from 'jss';
 import preset from 'jss-preset-default';
+import config from './config';
 
 
 jss.setup(preset());
@@ -13,7 +14,7 @@ const styles = {
         minHeight: 20,
         height: 20,
         maxHeight: 20,
-        outline: '1px solid red',
+        outline: (config.debugOutline) ? '1px solid red' : 'none',
         marginTop: 5,
         marginBottom: 5,
         paddingLeft: 10,
@@ -26,7 +27,7 @@ const styles = {
         left: -8,
         width: 16,
         height: 16,
-        outline: '1px solid cyan',
+        outline: (config.debugOutline) ? '1px solid cyan' : 'none',
     },
     dot: {
         display: 'block',
@@ -173,9 +174,9 @@ class _Input<T> {
         dot.className = classes.dot;
         snap.appendChild(dot);
         this.element.appendChild(snap);
-        if(this.elementField){
+        if (this.elementField) {
             this.element.appendChild(this.renderField());
-        }else{
+        } else {
             let span = document.createElement('span');
             span.innerText = this.name;
             this.element.appendChild(span);
@@ -188,7 +189,7 @@ class _Input<T> {
         fieldElement.innerHTML = `<span>${this.name}</span><input value='${this.value}'>`;
         (<HTMLElement>fieldElement.children[1]).onmousedown = (e) => {
             e.stopPropagation();
-            if(e.button !== 0) e.preventDefault();
+            if (e.button !== 0) e.preventDefault();
         }
         return fieldElement;
     }
@@ -203,7 +204,7 @@ class _InputNumber extends _Input<number> {
     public min:number;
     public max:number;
 
-    constructor(name:string, defaultValue:number=0, min:number=0, max:number=100, elementField?:boolean) {
+    constructor(name:string, defaultValue:number = 0, min:number = 0, max:number = 100, elementField?:boolean) {
         super(name, defaultValue, elementField);
         this.min = min;
         this.max = max;
@@ -228,7 +229,7 @@ class _InputFloat extends _Input<number> {
     public max:number;
     public step:number;
 
-    constructor(name:string, defaultValue:number=0, min:number=0, max:number=1, step:number=0.1, elementField?:boolean) {
+    constructor(name:string, defaultValue:number = 0, min:number = 0, max:number = 1, step:number = 0.1, elementField?:boolean) {
         super(name, defaultValue, elementField);
         this.min = min;
         this.max = max;
@@ -251,7 +252,7 @@ class _InputFloat extends _Input<number> {
 
 class _InputBoolean extends _Input<boolean> {
 
-    constructor(name:string, defaultValue:boolean=false, elementField?:boolean) {
+    constructor(name:string, defaultValue:boolean = false, elementField?:boolean) {
         super(name, defaultValue, elementField);
     }
 
@@ -268,7 +269,7 @@ class _InputBoolean extends _Input<boolean> {
 
 
 class _InputString extends _Input<string> {
-    constructor(name:string, defaultValue:string='', elementField?:boolean) {
+    constructor(name:string, defaultValue:string = '', elementField?:boolean) {
         super(name, defaultValue, elementField);
     }
 }

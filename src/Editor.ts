@@ -6,8 +6,7 @@ import preset from 'jss-preset-default';
 
 jss.setup(preset());
 
-const DEFAULT_CANVAS_WIDTH = 4000;
-const DEFAULT_CANVAS_HEIGHT = 4000;
+import config from './config';
 
 const styles = {
     view: {
@@ -24,8 +23,8 @@ const styles = {
         position: 'absolute',
         top: 0,
         left: 0,
-        width: DEFAULT_CANVAS_WIDTH,
-        height: DEFAULT_CANVAS_HEIGHT,
+        width: config.defaultCanvasWidth,
+        height: config.defaultCanvasHeight,
         backgroundColor: '#444444',
         background: `
             linear-gradient(to right, rgba(255,255,255,0.1) 1px, transparent 1px),
@@ -57,7 +56,7 @@ const styles = {
         left: 0,
         width: '100%',
         height: '40px',
-        outline: '1px solid red',
+        outline: (config.debugOutline) ? '1px solid red' : 'none',
         cursor: 'pointer',
     },
     graphElement: {
@@ -67,7 +66,7 @@ const styles = {
         left: 0,
         width: '100%',
         height: '40px',
-        outline: '1px solid red',
+        outline: (config.debugOutline) ? '1px solid red' : 'none',
         '&.graphSelected': {
             fontWeight: 'bold',
         }
@@ -86,8 +85,8 @@ class _EditorView {
     public scrollX:number = 0;
     public scrollY:number = 0;
     public zoom:number = 1;
-    public sizeX:number = DEFAULT_CANVAS_WIDTH;
-    public sizeY:number = DEFAULT_CANVAS_HEIGHT;
+    public sizeX:number = config.defaultCanvasWidth;
+    public sizeY:number = config.defaultCanvasHeight;
     public move:boolean = false;
     public zIndex:number = 10;
 
@@ -123,8 +122,8 @@ class _EditorView {
 
     private setupMove():void {
         window.addEventListener('load', (e) => {
-            this.container.scrollLeft = DEFAULT_CANVAS_WIDTH / 2 - this.container.getBoundingClientRect().width / 2;
-            this.container.scrollTop = DEFAULT_CANVAS_HEIGHT / 2 - this.container.getBoundingClientRect().height / 2;
+            this.container.scrollLeft = config.defaultCanvasWidth / 2 - this.container.getBoundingClientRect().width / 2;
+            this.container.scrollTop = config.defaultCanvasHeight / 2 - this.container.getBoundingClientRect().height / 2;
             this.scrollX = this.container.scrollLeft;
             this.scrollY = this.container.scrollTop;
         });
@@ -286,7 +285,7 @@ class _EditorNodes {
                 this.editor.view.scrollX / this.editor.view.zoom + 200,
                 this.editor.view.scrollY / this.editor.view.zoom + 200
             ];
-            newNode.nodeBox.zIndex = this.editor.view.zIndex+1;
+            newNode.nodeBox.zIndex = this.editor.view.zIndex + 1;
             this.editor.view.zIndex += 1;
             newNode.element.style.zIndex = newNode.nodeBox.zIndex.toString();
             this.editor.createNode(newNode);
