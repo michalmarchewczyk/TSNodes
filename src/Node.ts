@@ -10,7 +10,7 @@ jss.setup(preset());
 
 const DEFAULT_WIDTH = 120;
 const MIN_WIDTH = 80;
-const MAX_WIDTH = 240;
+const MAX_WIDTH = 1240;
 
 interface _NodeBox {
     pos:[number, number];
@@ -27,37 +27,41 @@ const styles = {
         position: 'absolute',
         background: '#777777',
         outline: '1px solid blue',
-        minHeight: '80px',
+        minHeight: 40,
+        height: 'auto',
         '&.nodeCollapsed': {
-            maxHeight: '30px',
-            minHeight: '30px',
+            maxHeight: 22,
+            minHeight: 22,
+            overflow: 'hidden',
             '& $name button': {
                 borderStyle: 'solid',
                 borderWidth: '6px 0 6px 10px',
                 borderColor: 'transparent transparent transparent white',
                 top: '-4px',
             }
-        }
+        },
     },
     handleLeft: {
         display: 'block',
         position: 'absolute',
-        top: 10,
-        left: -10,
-        width: 20,
-        height: 'calc(100% - 10px)',
+        top: 20,
+        left: -8,
+        width: 16,
+        height: 'calc(100% - 20px)',
         outline: '1px solid green',
         cursor: 'ew-resize',
+        zIndex: 20,
     },
     handleRight: {
         display: 'block',
         position: 'absolute',
-        top: 10,
-        right: -10,
-        width: 20,
-        height: 'calc(100% - 10px)',
+        top: 20,
+        right: -8,
+        width: 16,
+        height: 'calc(100% - 20px)',
         outline: '1px solid green',
         cursor: 'ew-resize',
+        zIndex: 20,
     },
     name: {
         display: 'block',
@@ -83,6 +87,17 @@ const styles = {
             margin: '4px',
             top: 0,
         }
+    },
+    nodeContainer: {
+        display: 'block',
+        position: 'relative',
+        marginTop: 25,
+        marginBottom: 5,
+        left: 0,
+        width: '100%',
+        height: 'auto',
+        outline: '2px solid orange',
+        zIndex: 30,
     }
 }
 
@@ -121,6 +136,22 @@ abstract class _Node {
         rightHandle.className = classes.handleRight;
         this.element.appendChild(rightHandle);
         this.setupNodeControls();
+        let name = document.createElement('div');
+        name.className = classes.name;
+        name.innerHTML = `<button></button><span>${this.name}</span>`;
+        (<HTMLElement>name.children[0]).onclick = (e) => {
+            if(this.nodeBox.collapsed){
+                this.nodeBox.collapsed = false;
+                this.element.classList.remove('nodeCollapsed');
+            }else{
+                this.nodeBox.collapsed = true;
+                this.element.classList.add('nodeCollapsed');
+            }
+        }
+        this.element.appendChild(name);
+        let nodeContainer = document.createElement('div');
+        nodeContainer.className = classes.nodeContainer;
+        this.element.appendChild(nodeContainer);
     }
 
     private setupNodeControls():void {
@@ -132,7 +163,10 @@ abstract class _Node {
             let clientX:number;
             let clientY:number;
             this.moving = true;
+            this.editor.view.move = true;
             this.editor.view.container.onmousemove = (e) => {
+                e.preventDefault();
+                e.stopPropagation();
                 if (!this.moving) return;
                 let deltaX = clientX ? e.clientX - clientX : 0;
                 let deltaY = clientY ? e.clientY - clientY : 0;
@@ -144,6 +178,7 @@ abstract class _Node {
             }
             this.editor.view.container.onmouseup = (e) => {
                 this.moving = false;
+                this.editor.view.move = false;
                 this.editor.view.container.onmouseleave = null;
                 this.editor.view.container.onmouseup = null;
                 this.editor.view.container.onmousemove = null;
@@ -195,29 +230,16 @@ abstract class _Node {
             }
             this.editor.view.container.onmouseleave = this.editor.view.container.onmouseup;
         }
-        let name = document.createElement('div');
-        name.className = classes.name;
-        name.innerHTML = `<button></button><span>${this.name}</span>`;
-        (<HTMLElement>name.children[0]).onclick = (e) => {
-            if(this.nodeBox.collapsed){
-                console.log('expand');
-                this.nodeBox.collapsed = false;
-                this.element.classList.remove('nodeCollapsed');
-            }else{
-                console.log('collapse');
-                this.nodeBox.collapsed = true;
-                this.element.classList.add('nodeCollapsed');
-            }
-        }
-        this.element.appendChild(name);
     }
 
     addInput(input:_Input<any>) {
         this.inputs.push(input);
+        this.element.children[3].appendChild(input.render());
     }
 
     addOutput(output:_Output<any>) {
         this.outputs.push(output);
+        this.element.children[3].appendChild(output.render());
     }
 
     addConnection(input:_Input<any>, output:_Output<any>) {

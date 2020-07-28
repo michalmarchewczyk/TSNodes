@@ -1,4 +1,4 @@
-import _Input from './Input';
+import _Input, {_InputBoolean, _InputFloat, _InputNumber, _InputString} from './Input';
 import _Output from './Output';
 import _Node from './Node';
 import _Graph from './Graph';
@@ -17,6 +17,10 @@ let TSNodes = {
     // EditorGraphs: _EditorGraphs,
     // EditorNodes: _EditorNodes,
     // EditorInfo: _EditorInfo,
+    InputNumber: _InputNumber,
+    InputFloat: _InputFloat,
+    InputBoolean: _InputBoolean,
+    InputString: _InputString,
 }
 
 export default TSNodes;

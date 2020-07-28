@@ -129,16 +129,15 @@ class _EditorView {
             this.scrollY = this.container.scrollTop;
         });
         this.canvas.onmousedown = (e) => {
-            e.preventDefault();
             e.stopPropagation();
-
             let clientX:number;
             let clientY:number;
             if (e.button !== 1 || this.move) return;
+            e.preventDefault();
             this.move = true;
             this.container.style.cursor = 'move';
             this.canvas.onmouseup = (e) => {
-                e.preventDefault();
+                // e.preventDefault();
                 e.stopPropagation();
                 this.move = false;
                 this.container.style.cursor = 'auto';
@@ -258,6 +257,7 @@ class _EditorGraphs {
 class _EditorNodes {
     public container:HTMLElement;
     private editor:_Editor;
+    public tempNode?:_Node;
 
     public nodes:Function[] = [];
 
@@ -276,18 +276,20 @@ class _EditorNodes {
     renderNodeElement(node:Function):HTMLElement {
         let nodeElement = document.createElement('div');
         nodeElement.className = classes.nodeElement;
-        nodeElement.innerText = node.name;
+        this.tempNode = new (<any>node)();
+        nodeElement.innerText = this.tempNode?.name ?? '';
+        delete this.tempNode;
 
         nodeElement.onclick = (e) => {
             let newNode = new (<any>node)();
             newNode.nodeBox.pos = [
-                (this.editor?.view.scrollX || 0) / (this.editor?.view.zoom || 0) + 200,
-                (this.editor?.view.scrollY || 0) / (this.editor?.view.zoom || 0) + 200
+                this.editor.view.scrollX / this.editor.view.zoom + 200,
+                this.editor.view.scrollY / this.editor.view.zoom + 200
             ];
             newNode.nodeBox.zIndex = this.editor.view.zIndex+1;
             this.editor.view.zIndex += 1;
             newNode.element.style.zIndex = newNode.nodeBox.zIndex.toString();
-            this.editor?.createNode(newNode);
+            this.editor.createNode(newNode);
         }
 
         return nodeElement;
@@ -340,8 +342,6 @@ class _Editor {
 
     selectGraph(graph:_Graph) {
         this.view.selectGraph(graph);
-        console.log('select');
-
     }
 
     createNode(node:_Node):void {
