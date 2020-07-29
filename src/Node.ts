@@ -19,6 +19,10 @@ interface _NodeBox {
     zIndex:number;
 }
 
+type nodeClass = (editor:_Editor, name:string) => any;
+
+export {nodeClass}
+
 const styles = {
     node: {
         display: 'block',
@@ -101,8 +105,8 @@ const styles = {
 
 const {classes} = jss.createStyleSheet(styles).attach();
 
+
 abstract class _Node {
-    public name:string;
     public inputs:_Input<any>[] = [];
     public outputs:_Output<any>[] = [];
     public connections:_Connection[] = [];
@@ -116,28 +120,25 @@ abstract class _Node {
     };
     public element:HTMLElement;
     public moving:boolean = false;
-    private editor:_Editor;
 
-    protected constructor(editor:_Editor, name:string) {
-        this.editor = editor;
-        this.name = name;
+    protected constructor(private editor:_Editor, public name:string) {
         this.element = document.createElement('div');
         this.setupElement();
     }
 
     setupElement():void {
         this.element.className = classes.node;
-        let leftHandle = document.createElement('div');
+        const leftHandle = document.createElement('div');
         leftHandle.className = classes.handleLeft;
         this.element.appendChild(leftHandle);
-        let rightHandle = document.createElement('div');
+        const rightHandle = document.createElement('div');
         rightHandle.className = classes.handleRight;
         this.element.appendChild(rightHandle);
         this.setupNodeControls();
-        let name = document.createElement('div');
+        const name = document.createElement('div');
         name.className = classes.name;
         name.innerHTML = `<button></button><span>${this.name}</span>`;
-        (<HTMLElement>name.children[0]).onclick = (e) => {
+        (<HTMLElement>name.children[0]).onclick = () => {
             if (this.nodeBox.collapsed) {
                 this.nodeBox.collapsed = false;
                 this.element.classList.remove('nodeCollapsed');
@@ -147,88 +148,9 @@ abstract class _Node {
             }
         }
         this.element.appendChild(name);
-        let nodeContainer = document.createElement('div');
+        const nodeContainer = document.createElement('div');
         nodeContainer.className = classes.nodeContainer;
         this.element.appendChild(nodeContainer);
-    }
-
-    private setupNodeControls():void {
-        this.element.onmousedown = (e) => {
-            this.nodeBox.zIndex = this.editor.view.zIndex + 1;
-            this.editor.view.zIndex += 1;
-            this.element.style.zIndex = this.nodeBox.zIndex.toString();
-            e.preventDefault();
-            if (e.button !== 0) return;
-            let clientX:number;
-            let clientY:number;
-            this.moving = true;
-            this.editor.view.move = true;
-            this.editor.view.container.onmousemove = (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                if (!this.moving) return;
-                let deltaX = clientX ? e.clientX - clientX : 0;
-                let deltaY = clientY ? e.clientY - clientY : 0;
-                clientX = e.clientX;
-                clientY = e.clientY;
-                this.nodeBox.pos = [this.nodeBox.pos[0] + deltaX / this.editor.view.zoom, this.nodeBox.pos[1] + deltaY / this.editor.view.zoom];
-                this.element.style.left = this.nodeBox.pos[0] + 'px';
-                this.element.style.top = this.nodeBox.pos[1] + 'px';
-            }
-            this.editor.view.container.onmouseup = (e) => {
-                this.moving = false;
-                this.editor.view.move = false;
-                this.editor.view.container.onmouseleave = null;
-                this.editor.view.container.onmouseup = null;
-                this.editor.view.container.onmousemove = null;
-            }
-            this.editor.view.container.onmouseleave = this.editor.view.container.onmouseup;
-        }
-        let leftHandle = <HTMLElement>this.element.children[0];
-        let rightHandle = <HTMLElement>this.element.children[1];
-        leftHandle.onmousedown = (e) => {
-            e.stopPropagation();
-            e.preventDefault();
-            let clientX:number;
-            this.editor.view.container.onmousemove = (e) => {
-                let deltaX = clientX ? clientX - e.clientX : 0;
-                let old_width = this.nodeBox.width;
-                this.nodeBox.width = Math.min(config.maxNodeWidth, Math.max(config.minNodeWidth, this.nodeBox.width + deltaX / this.editor.view.zoom));
-                if (old_width !== this.nodeBox.width) {
-                    this.nodeBox.pos = [this.nodeBox.pos[0] - deltaX / this.editor.view.zoom, this.nodeBox.pos[1]];
-                    this.element.style.left = this.nodeBox.pos[0] + 'px';
-                }
-                if (this.nodeBox.width !== config.minNodeWidth && this.nodeBox.width !== config.maxNodeWidth || !clientX) {
-                    clientX = e.clientX;
-                }
-                this.element.style.width = this.nodeBox.width + 'px';
-            }
-            this.editor.view.container.onmouseup = (e) => {
-                this.editor.view.container.onmouseleave = null;
-                this.editor.view.container.onmouseup = null;
-                this.editor.view.container.onmousemove = null;
-            }
-            this.editor.view.container.onmouseleave = this.editor.view.container.onmouseup;
-        }
-        rightHandle.onmousedown = (e) => {
-            e.stopPropagation();
-            e.preventDefault();
-            let clientX:number;
-            this.editor.view.container.onmousemove = (e) => {
-                let deltaX = clientX ? e.clientX - clientX : 0;
-                this.nodeBox.width = Math.min(config.maxNodeWidth, Math.max(config.minNodeWidth, this.nodeBox.width + deltaX / this.editor.view.zoom));
-                if (this.nodeBox.width !== config.minNodeWidth && this.nodeBox.width !== config.maxNodeWidth || !clientX) {
-                    clientX = e.clientX;
-                }
-                this.element.style.width = this.nodeBox.width + 'px';
-            }
-            this.editor.view.container.onmouseup = (e) => {
-                this.editor.view.container.onmouseleave = null;
-                this.editor.view.container.onmouseup = null;
-                this.editor.view.container.onmousemove = null;
-            }
-            this.editor.view.container.onmouseleave = this.editor.view.container.onmouseup;
-        }
     }
 
     addInput(input:_Input<any>) {
@@ -251,6 +173,88 @@ abstract class _Node {
         this.element.style.width = this.nodeBox.width + 'px';
         this.element.style.zIndex = this.nodeBox.zIndex.toString();
         return this.element;
+    }
+
+    private setupNodeControls():void {
+        this.element.onmousedown = (e) => {
+            this.nodeBox.zIndex = this.editor.view.zIndex + 1;
+            this.editor.view.zIndex += 1;
+            this.element.style.zIndex = this.nodeBox.zIndex.toString();
+            e.preventDefault();
+            if (e.button !== 0) return;
+            let clientX:number;
+            let clientY:number;
+            this.moving = true;
+            this.editor.view.move = true;
+            this.editor.view.container.onmousemove = (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                if (!this.moving) return;
+                const deltaX = clientX ? e.clientX - clientX : 0;
+                const deltaY = clientY ? e.clientY - clientY : 0;
+                clientX = e.clientX;
+                clientY = e.clientY;
+                this.nodeBox.pos = [
+                    this.nodeBox.pos[0] + deltaX / this.editor.view.zoom,
+                    this.nodeBox.pos[1] + deltaY / this.editor.view.zoom
+                ];
+                this.element.style.left = this.nodeBox.pos[0] + 'px';
+                this.element.style.top = this.nodeBox.pos[1] + 'px';
+            }
+            this.editor.view.container.onmouseup = () => {
+                this.moving = false;
+                this.editor.view.move = false;
+                this.editor.view.container.onmouseleave = null;
+                this.editor.view.container.onmouseup = null;
+                this.editor.view.container.onmousemove = null;
+            }
+            this.editor.view.container.onmouseleave = this.editor.view.container.onmouseup;
+        }
+        const leftHandle = <HTMLElement>this.element.children[0];
+        const rightHandle = <HTMLElement>this.element.children[1];
+        leftHandle.onmousedown = (e) => {
+            e.stopPropagation();
+            e.preventDefault();
+            let clientX:number;
+            this.editor.view.container.onmousemove = (e) => {
+                const deltaX = clientX ? clientX - e.clientX : 0;
+                const oldWidth = this.nodeBox.width;
+                this.nodeBox.width = Math.min(config.maxNodeWidth, Math.max(config.minNodeWidth, this.nodeBox.width + deltaX / this.editor.view.zoom));
+                if (oldWidth !== this.nodeBox.width) {
+                    this.nodeBox.pos = [this.nodeBox.pos[0] - deltaX / this.editor.view.zoom, this.nodeBox.pos[1]];
+                    this.element.style.left = this.nodeBox.pos[0] + 'px';
+                }
+                if (this.nodeBox.width !== config.minNodeWidth && this.nodeBox.width !== config.maxNodeWidth || !clientX) {
+                    clientX = e.clientX;
+                }
+                this.element.style.width = this.nodeBox.width + 'px';
+            }
+            this.editor.view.container.onmouseup = () => {
+                this.editor.view.container.onmouseleave = null;
+                this.editor.view.container.onmouseup = null;
+                this.editor.view.container.onmousemove = null;
+            }
+            this.editor.view.container.onmouseleave = this.editor.view.container.onmouseup;
+        }
+        rightHandle.onmousedown = (e) => {
+            e.stopPropagation();
+            e.preventDefault();
+            let clientX:number;
+            this.editor.view.container.onmousemove = (e) => {
+                const deltaX = clientX ? e.clientX - clientX : 0;
+                this.nodeBox.width = Math.min(config.maxNodeWidth, Math.max(config.minNodeWidth, this.nodeBox.width + deltaX / this.editor.view.zoom));
+                if (this.nodeBox.width !== config.minNodeWidth && this.nodeBox.width !== config.maxNodeWidth || !clientX) {
+                    clientX = e.clientX;
+                }
+                this.element.style.width = this.nodeBox.width + 'px';
+            }
+            this.editor.view.container.onmouseup = () => {
+                this.editor.view.container.onmouseleave = null;
+                this.editor.view.container.onmouseup = null;
+                this.editor.view.container.onmousemove = null;
+            }
+            this.editor.view.container.onmouseleave = this.editor.view.container.onmouseup;
+        }
     }
 }
 

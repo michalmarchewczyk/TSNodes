@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/michalmarchewczyk/TSNodes#readme",
   "devDependencies": {
+    "tslint": "^6.1.2",
     "typescript": "^3.9.7"
   },
   "dependencies": {

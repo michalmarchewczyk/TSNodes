@@ -6,9 +6,8 @@ class _Engine {
 
     }
 
-    calculate(graph:_Graph, start: _Node):any{
-
-        return ;
+    calculate(graph:_Graph, start:_Node):any {
+        return;
     }
 }
 

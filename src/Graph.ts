@@ -2,12 +2,10 @@ import _Node from './Node';
 import _Connection from './Connection';
 
 class _Graph {
-    public name:string;
     public nodes:_Node[] = [];
     public connections:_Connection[] = [];
 
-    constructor(name:string) {
-        this.name = name;
+    constructor(public name:string) {
     }
 
     addNode(node:_Node):void {
@@ -18,7 +16,7 @@ class _Graph {
     }
 
     addConnection(connection:_Connection):void {
-        if(!this.connections.includes(connection)){
+        if (!this.connections.includes(connection)) {
             this.connections.push(connection);
         }
     }

@@ -1,5 +1,5 @@
 import _Graph from './Graph';
-import _Node from './Node';
+import _Node, {nodeClass} from './Node';
 
 import jss from 'jss';
 import preset from 'jss-preset-default';
@@ -80,7 +80,6 @@ class _EditorView {
     public container:HTMLElement;
     public canvas:HTMLElement;
     public background:SVGSVGElement;
-    private editor:_Editor;
 
     public scrollX:number = 0;
     public scrollY:number = 0;
@@ -92,17 +91,30 @@ class _EditorView {
 
     public graph?:_Graph;
 
-    constructor(editor:_Editor) {
+    constructor(private editor:_Editor) {
         this.container = document.createElement('div');
         this.container.className = classes.view;
         this.container = <HTMLElement>this.container;
         this.canvas = document.createElement('div');
         this.background = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
 
-        this.editor = editor;
-
         this.setupContainer();
         this.setupControls();
+    }
+
+    selectGraph(graph:_Graph):void {
+        this.graph = graph;
+        this.renderGraph();
+    }
+
+    createNode(node:_Node):void {
+        this.graph?.addNode(node);
+        const nodeElement = node.render();
+        this.canvas.appendChild(nodeElement);
+    }
+
+    render():HTMLElement {
+        return this.container;
     }
 
     private setupContainer():void {
@@ -121,9 +133,9 @@ class _EditorView {
     }
 
     private setupMove():void {
-        window.addEventListener('load', (e) => {
-            this.container.scrollLeft = config.defaultCanvasWidth / 2 - this.container.getBoundingClientRect().width / 2;
-            this.container.scrollTop = config.defaultCanvasHeight / 2 - this.container.getBoundingClientRect().height / 2;
+        window.addEventListener('load', () => {
+            this.container.scrollLeft = (config.defaultCanvasWidth - this.container.getBoundingClientRect().width) / 2;
+            this.container.scrollTop = (config.defaultCanvasHeight - this.container.getBoundingClientRect().height) / 2;
             this.scrollX = this.container.scrollLeft;
             this.scrollY = this.container.scrollTop;
         });
@@ -149,8 +161,8 @@ class _EditorView {
                 e.preventDefault();
                 e.stopPropagation();
 
-                let deltaX = clientX ? clientX - e.clientX : 0;
-                let deltaY = clientY ? clientY - e.clientY : 0;
+                const deltaX = clientX ? clientX - e.clientX : 0;
+                const deltaY = clientY ? clientY - e.clientY : 0;
                 clientX = e.clientX;
                 clientY = e.clientY;
 
@@ -168,14 +180,14 @@ class _EditorView {
             e.stopPropagation();
             if (this.move) return;
 
-            let old_zoom = this.zoom;
+            const oldZoom = this.zoom;
             this.zoom = this.zoom - Math.sign(e.deltaY) * 0.1;
             this.zoom = Math.min(Math.max(0.6, this.zoom), 2)
             this.canvas.style.transform = `scale(${this.zoom})`;
-            let rescale = this.zoom / old_zoom - 1;
+            const rescale = this.zoom / oldZoom - 1;
 
-            let mouseX = e.clientX - this.container.getBoundingClientRect().left;
-            let mouseY = e.clientY - this.container.getBoundingClientRect().top;
+            const mouseX = e.clientX - this.container.getBoundingClientRect().left;
+            const mouseY = e.clientY - this.container.getBoundingClientRect().top;
             this.container.scrollTop += (this.scrollY + mouseY) * rescale;
             this.container.scrollLeft += (this.scrollX + mouseX) * rescale;
             this.scrollY = this.container.scrollTop;
@@ -183,40 +195,24 @@ class _EditorView {
         }
     }
 
-    selectGraph(graph:_Graph):void {
-        this.graph = graph;
-        this.renderGraph();
-    }
-
     private renderGraph():void {
         this.canvas.innerHTML = '';
         this.canvas.appendChild(this.background);
         if (!this.graph) throw new Error('There is no graph selected');
         this.graph.nodes.forEach((node) => {
-            let nodeElement = node.render();
+            const nodeElement = node.render();
             this.canvas.appendChild(nodeElement);
         })
-    }
-
-    createNode(node:_Node):void {
-        this.graph?.addNode(node);
-        let nodeElement = node.render();
-        this.canvas.appendChild(nodeElement);
-    }
-
-    render():HTMLElement {
-        return this.container;
     }
 }
 
 
 class _EditorGraphs {
     public container:HTMLElement;
-    private editor:_Editor;
 
     public graphs:_Graph[] = [];
 
-    constructor(editor:_Editor) {
+    constructor(private editor:_Editor) {
         this.container = document.createElement('div');
         this.container.innerHTML = 'graphs';
         this.editor = editor;
@@ -224,7 +220,7 @@ class _EditorGraphs {
 
     addGraph(graph:_Graph) {
         this.graphs.push(graph);
-        let graphElement = this.renderGraphElement(graph)
+        const graphElement = this.renderGraphElement(graph)
         this.container.appendChild(graphElement);
         this.editor.selectGraph(graph);
         Array.from(this.container.children).forEach(child => {
@@ -234,10 +230,10 @@ class _EditorGraphs {
     }
 
     renderGraphElement(graph:_Graph):HTMLElement {
-        let graphElement = document.createElement('div');
+        const graphElement = document.createElement('div');
         graphElement.className = classes.graphElement;
         graphElement.innerText = graph.name;
-        graphElement.onclick = (e) => {
+        graphElement.onclick = () => {
             this.editor.selectGraph(graph);
             Array.from(this.container.children).forEach(child => {
                 child.classList.remove('graphSelected');
@@ -255,32 +251,30 @@ class _EditorGraphs {
 
 class _EditorNodes {
     public container:HTMLElement;
-    private editor:_Editor;
     public tempNode?:_Node;
 
-    public nodes:Function[] = [];
+    public nodes:nodeClass[] = [];
 
-    constructor(editor:_Editor) {
+    constructor(private editor:_Editor) {
         this.container = document.createElement('div');
         this.container.innerHTML = 'nodes';
-        this.editor = editor;
     }
 
-    addNode(node:Function) {
+    addNode(node:nodeClass) {
         if (typeof node !== 'function') return;
         this.nodes.push(node);
         this.container.appendChild(this.renderNodeElement(node));
     }
 
-    renderNodeElement(node:Function):HTMLElement {
-        let nodeElement = document.createElement('div');
+    renderNodeElement(node:nodeClass):HTMLElement {
+        const nodeElement = document.createElement('div');
         nodeElement.className = classes.nodeElement;
         this.tempNode = new (<any>node)();
         nodeElement.innerText = this.tempNode?.name ?? '';
         delete this.tempNode;
 
-        nodeElement.onclick = (e) => {
-            let newNode = new (<any>node)();
+        nodeElement.onclick = () => {
+            const newNode = new (<any>node)();
             newNode.nodeBox.pos = [
                 this.editor.view.scrollX / this.editor.view.zoom + 200,
                 this.editor.view.scrollY / this.editor.view.zoom + 200
@@ -302,12 +296,10 @@ class _EditorNodes {
 
 class _EditorInfo {
     public container:HTMLElement;
-    private editor:_Editor;
 
-    constructor(editor:_Editor) {
+    constructor(private editor:_Editor) {
         this.container = document.createElement('div');
         this.container.innerHTML = 'info';
-        this.editor = editor;
     }
 
     render():HTMLElement {
@@ -329,12 +321,12 @@ class _Editor {
         this.info = new _EditorInfo(this);
     }
 
-    addNode(node:Function):void {
+    addNode(node:nodeClass):void {
         this.nodes?.addNode(node);
     }
 
     createGraph(name:string) {
-        let graph = new _Graph(name);
+        const graph = new _Graph(name);
         this.graphs?.addGraph(graph);
         this.selectGraph(graph);
     }

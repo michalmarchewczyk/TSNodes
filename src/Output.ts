@@ -1,4 +1,3 @@
-
 import jss from 'jss';
 import preset from 'jss-preset-default';
 import config from './config';
@@ -43,11 +42,11 @@ const styles = {
 
 const {classes} = jss.createStyleSheet(styles).attach();
 
-type _OutputFn<T> = (inputs: any[]) => T;
+type _OutputFn<T> = (inputs:any[]) => T;
 
 class _Output<T> {
     public name:string;
-    public fn: _OutputFn<T>;
+    public fn:_OutputFn<T>;
     public element:HTMLElement;
 
     constructor(name:string, fn:_OutputFn<T>) {
@@ -57,12 +56,12 @@ class _Output<T> {
         this.setupElement();
     }
 
-    setupElement(){
+    setupElement() {
         this.element.className = classes.outputElement;
         this.element.innerText = this.name;
-        let snap = document.createElement('div');
+        const snap = document.createElement('div');
         snap.className = classes.snap;
-        let dot = document.createElement('div');
+        const dot = document.createElement('div');
         dot.className = classes.dot;
         snap.appendChild(dot);
         this.element.appendChild(snap);
