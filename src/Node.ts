@@ -121,7 +121,7 @@ abstract class _Node {
     public element:HTMLElement;
     public moving:boolean = false;
 
-    protected constructor(private editor:_Editor, public name:string) {
+    protected constructor(public editor:_Editor, public name:string) {
         this.element = document.createElement('div');
         this.setupElement();
     }
@@ -155,16 +155,18 @@ abstract class _Node {
 
     addInput(input:_Input<any>) {
         this.inputs.push(input);
+        input.node = this;
         this.element.children[3].appendChild(input.render());
     }
 
     addOutput(output:_Output<any>) {
         this.outputs.push(output);
+        output.node = this;
         this.element.children[3].appendChild(output.render());
     }
 
-    addConnection(input:_Input<any>, output:_Output<any>) {
-        this.connections.push(new _Connection(input, output));
+    addConnection(connection:_Connection) {
+        this.connections.push(connection);
     }
 
     render():HTMLElement {
@@ -190,6 +192,7 @@ abstract class _Node {
                 e.preventDefault();
                 e.stopPropagation();
                 if (!this.moving) return;
+                this.updateConnections();
                 const deltaX = clientX ? e.clientX - clientX : 0;
                 const deltaY = clientY ? e.clientY - clientY : 0;
                 clientX = e.clientX;
@@ -255,6 +258,12 @@ abstract class _Node {
             }
             this.editor.view.container.onmouseleave = this.editor.view.container.onmouseup;
         }
+    }
+
+    private updateConnections() {
+        this.connections.forEach(connection => {
+            connection.updatePos();
+        })
     }
 }
 

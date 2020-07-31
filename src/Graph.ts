@@ -8,14 +8,14 @@ class _Graph {
     constructor(public name:string) {
     }
 
-    addNode(node:_Node):void {
+    createNode(node:_Node):void {
         this.nodes.push(node);
         node.connections.forEach(connection => {
-            this.addConnection(connection);
+            this.createConnection(connection);
         });
     }
 
-    addConnection(connection:_Connection):void {
+    createConnection(connection:_Connection):void {
         if (!this.connections.includes(connection)) {
             this.connections.push(connection);
         }
@@ -25,7 +25,7 @@ class _Graph {
         this.connections = [];
         this.nodes.forEach(node => {
             node.connections.forEach(connection => {
-                this.addConnection(connection);
+                this.createConnection(connection);
             })
         })
     }

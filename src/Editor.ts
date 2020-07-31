@@ -7,6 +7,9 @@ import preset from 'jss-preset-default';
 jss.setup(preset());
 
 import config from './config';
+import _Input from './Input';
+import _Output from './Output';
+import _Connection from './Connection';
 
 const styles = {
     view: {
@@ -16,7 +19,7 @@ const styles = {
         left: 0,
         width: '100%',
         height: '100%',
-        overflow: 'scroll',
+        overflow: 'hidden',
     },
     canvas: {
         display: 'block',
@@ -49,6 +52,20 @@ const styles = {
             strokeWidth: 2,
         }
     },
+    foreground: {
+        display: 'block',
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '100%',
+        '& line': {
+            stroke: 'white',
+            strokeWidth: 2,
+        },
+        zIndex: 100,
+        pointerEvents: 'none',
+    },
     nodeElement: {
         display: 'block',
         position: 'relative',
@@ -75,11 +92,25 @@ const styles = {
 
 const {classes} = jss.createStyleSheet(styles).attach();
 
+interface foregroundState {
+    input:_Input<any> | null;
+    output:_Output<any> | null;
+    active:boolean;
+    line:SVGLineElement | null;
+}
+
 
 class _EditorView {
     public container:HTMLElement;
     public canvas:HTMLElement;
     public background:SVGSVGElement;
+    public foreground:SVGSVGElement;
+    public foregroundState:foregroundState = {
+        input: null,
+        output: null,
+        active: false,
+        line: null,
+    };
 
     public scrollX:number = 0;
     public scrollY:number = 0;
@@ -97,24 +128,35 @@ class _EditorView {
         this.container = <HTMLElement>this.container;
         this.canvas = document.createElement('div');
         this.background = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-
+        this.foreground = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
         this.setupContainer();
         this.setupControls();
     }
 
-    selectGraph(graph:_Graph):void {
+    selectGraph(graph:_Graph) {
         this.graph = graph;
         this.renderGraph();
     }
 
-    createNode(node:_Node):void {
-        this.graph?.addNode(node);
+    createNode(node:_Node) {
+        this.graph?.createNode(node);
         const nodeElement = node.render();
         this.canvas.appendChild(nodeElement);
     }
 
+    createConnection(connection:_Connection) {
+        this.graph?.createConnection(connection);
+        connection.input.node?.addConnection(connection);
+        connection.output.node?.addConnection(connection);
+        const line = connection.render();
+        this.background.appendChild(line);
+    }
+
     render():HTMLElement {
-        return this.container;
+        const element = document.createElement('div');
+        element.appendChild(this.container);
+        element.appendChild(this.foreground);
+        return element;
     }
 
     private setupContainer():void {
@@ -125,6 +167,12 @@ class _EditorView {
         this.background.setAttribute('width', this.sizeX.toString());
         this.background.setAttribute('height', this.sizeY.toString());
         this.canvas.appendChild(this.background);
+
+        window.addEventListener('load', () => {
+            this.foreground.setAttribute('class', classes.foreground);
+            this.foreground.setAttribute('width', '100%');
+            this.foreground.setAttribute('height', '100%');
+        });
     }
 
     private setupControls():void {
@@ -143,8 +191,9 @@ class _EditorView {
             e.stopPropagation();
             let clientX:number;
             let clientY:number;
-            if (e.button !== 1 || this.move) return;
             e.preventDefault();
+            if (e.button !== 1 || this.move) return;
+
             this.move = true;
             this.container.style.cursor = 'move';
             this.canvas.onmouseup = (e) => {
