@@ -217,6 +217,16 @@ abstract class _Node {
         }
     }
 
+    move(deltaX:number, deltaY:number) {
+        this.nodeBox.pos = [
+            this.nodeBox.pos[0] + deltaX,
+            this.nodeBox.pos[1] + deltaY
+        ];
+        this.element.style.left = this.nodeBox.pos[0] + 'px';
+        this.element.style.top = this.nodeBox.pos[1] + 'px';
+        this.updateConnections();
+    }
+
     private setupNodeControls():void {
         this.element.onmousedown = (e) => {
             this.nodeBox.zIndex = this.editor.view.zIndex + 1;
@@ -236,17 +246,11 @@ abstract class _Node {
                 e.preventDefault();
                 e.stopPropagation();
                 if (!this.moving) return;
-                const deltaX = clientX ? e.clientX - clientX : 0;
-                const deltaY = clientY ? e.clientY - clientY : 0;
+                const deltaX = (clientX ? e.clientX - clientX : 0) / this.editor.view.zoom;
+                const deltaY = (clientY ? e.clientY - clientY : 0) / this.editor.view.zoom;
                 clientX = e.clientX;
                 clientY = e.clientY;
-                this.nodeBox.pos = [
-                    this.nodeBox.pos[0] + deltaX / this.editor.view.zoom,
-                    this.nodeBox.pos[1] + deltaY / this.editor.view.zoom
-                ];
-                this.element.style.left = this.nodeBox.pos[0] + 'px';
-                this.element.style.top = this.nodeBox.pos[1] + 'px';
-                this.updateConnections();
+                this.editor.view.moveNodes(deltaX, deltaY);
             }
             this.editor.view.container.onmouseup = () => {
                 this.moving = false;

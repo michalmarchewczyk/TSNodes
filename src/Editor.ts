@@ -188,6 +188,12 @@ class _EditorView {
         this.background.removeChild(line);
     }
 
+    moveNodes(deltaX:number, deltaY:number) {
+        this.selectedNodes.forEach(node => {
+            node.move(deltaX, deltaY);
+        });
+    }
+
     render():HTMLElement {
         const element = document.createElement('div');
         element.appendChild(this.container);
@@ -340,6 +346,8 @@ class _EditorView {
                 selectBox.style.top = startY + 'px';
                 selectBox.style.width = '0';
                 selectBox.style.height = '0';
+                selectBox.style.zIndex = this.zIndex.toString();
+                this.zIndex = this.zIndex + 1;
                 this.canvas.onmousemove = (e) => {
                     const currentX = (this.editor.view.scrollX + e.clientX - this.container.getBoundingClientRect().left) / this.editor.view.zoom;
                     const currentY = (this.editor.view.scrollY + e.clientY - this.container.getBoundingClientRect().top) / this.editor.view.zoom;
