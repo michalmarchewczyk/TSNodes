@@ -194,6 +194,30 @@ class _EditorView {
         });
     }
 
+    deleteNodes(nodes:_Node[]) {
+        nodes.slice().forEach(node => {
+            this.deleteNode(node);
+        })
+    }
+
+    deleteNode(node:_Node) {
+        node.connections.slice().forEach(connection => {
+            this.deleteConnection(connection);
+        });
+        let index = this.graph?.nodes.indexOf(node) ?? -1;
+        if(index > -1){
+            this.graph?.nodes.splice(index, 1);
+        }
+        if(this.activeNode === node){
+            this.activeNode = null;
+        }
+        this.canvas.removeChild(node.render());
+        index = this.selectedNodes.indexOf(node) ?? -1;
+        if(index > -1){
+            this.selectedNodes.splice(index, 1);
+        }
+    }
+
     render():HTMLElement {
         const element = document.createElement('div');
         element.appendChild(this.container);
@@ -315,6 +339,9 @@ class _EditorView {
                 case 'Alt':
                     this.keyboardState.alt = false;
                     break;
+            }
+            if(e.key === 'Delete'){
+                this.deleteNodes(this.selectedNodes);
             }
         })
     }
