@@ -21,6 +21,15 @@ class _Graph {
         }
     }
 
+    deleteConnection(connection:_Connection) {
+        if(this.connections.includes(connection)){
+            const index = this.connections.indexOf(connection);
+            if(index > -1) {
+                this.connections.splice(index, 1);
+            }
+        }
+    }
+
     recalculate():void {
         this.connections = [];
         this.nodes.forEach(node => {

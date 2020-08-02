@@ -160,6 +160,7 @@ class _Input<T> {
     public element:HTMLElement;
     public node?:_Node;
     public snap?:HTMLElement;
+    public connection:_Connection | null = null;
 
     constructor(public name:string, public defaultValue:T, private elementField:boolean = true, private socket:boolean = true) {
         this.value = this.defaultValue;
@@ -198,39 +199,83 @@ class _Input<T> {
             e.preventDefault();
             e.stopPropagation();
             this.node.editor.view.move = true;
-            foregroundState.active = true;
-            foregroundState.input = this;
-            foregroundState.output = null;
-            foregroundState.line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-            foregroundState.line.setAttribute('x1', (this.snap.getBoundingClientRect().left + 8*view.zoom - foreground.getBoundingClientRect().left).toString());
-            foregroundState.line.setAttribute('y1', (this.snap.getBoundingClientRect().top + 8*view.zoom  - foreground.getBoundingClientRect().top).toString());
-            foregroundState.line.setAttribute('x2', (e.clientX - foreground.getBoundingClientRect().left).toString());
-            foregroundState.line.setAttribute('y2', (e.clientY - foreground.getBoundingClientRect().top).toString());
-            foreground.appendChild(foregroundState.line);
-            view.container.onmousemove = (e) => {
-                if (!this.node || !this.snap || !foregroundState.line) return;
+            if(!this.connection) {
+                foregroundState.active = true;
+                foregroundState.input = this;
                 foregroundState.output = null;
-                foregroundState.line.setAttribute('x1', (this.snap.getBoundingClientRect().left + 8*view.zoom - foreground.getBoundingClientRect().left).toString());
-                foregroundState.line.setAttribute('y1', (this.snap.getBoundingClientRect().top + 8*view.zoom  - foreground.getBoundingClientRect().top).toString());
+                foregroundState.line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                foregroundState.line.setAttribute('x1', (this.snap.getBoundingClientRect().left + 8 * view.zoom - foreground.getBoundingClientRect().left).toString());
+                foregroundState.line.setAttribute('y1', (this.snap.getBoundingClientRect().top + 8 * view.zoom - foreground.getBoundingClientRect().top).toString());
                 foregroundState.line.setAttribute('x2', (e.clientX - foreground.getBoundingClientRect().left).toString());
                 foregroundState.line.setAttribute('y2', (e.clientY - foreground.getBoundingClientRect().top).toString());
-            }
-            view.container.onmouseup = (e) => {
-                if(foregroundState.input && foregroundState.output){
-                    const connection = new _Connection(foregroundState.output, foregroundState.input);
-                    view.createConnection(connection);
+                foreground.appendChild(foregroundState.line);
+                view.container.onmousemove = (e) => {
+                    if (!this.node || !this.snap || !foregroundState.line) return;
+                    foregroundState.output = null;
+                    foregroundState.line.setAttribute('x1', (this.snap.getBoundingClientRect().left + 8 * view.zoom - foreground.getBoundingClientRect().left).toString());
+                    foregroundState.line.setAttribute('y1', (this.snap.getBoundingClientRect().top + 8 * view.zoom - foreground.getBoundingClientRect().top).toString());
+                    foregroundState.line.setAttribute('x2', (e.clientX - foreground.getBoundingClientRect().left).toString());
+                    foregroundState.line.setAttribute('y2', (e.clientY - foreground.getBoundingClientRect().top).toString());
                 }
-                foregroundState.line?.remove();
-                foregroundState.line = null;
-                if(this.node) this.node.editor.view.move = false;
-                foregroundState.active = false;
+                view.container.onmouseup = (e) => {
+                    if (foregroundState.input && foregroundState.output) {
+                        const connection = new _Connection(foregroundState.output, foregroundState.input);
+                        view.createConnection(connection);
+                    }
+                    foregroundState.line?.remove();
+                    foregroundState.line = null;
+                    if (this.node) this.node.editor.view.move = false;
+                    foregroundState.active = false;
+                    foregroundState.input = null;
+                    foregroundState.output = null;
+                    view.container.onmousemove = null;
+                    view.container.onmouseup = null;
+                    view.container.onmouseleave = null;
+                }
+                view.container.onmouseleave = view.container.onmouseup;
+            }else{
+                this.connection.line.style.opacity = '0';
+                let output = this.connection.output;
+                if(!output.snap) return;
+                foregroundState.active = true;
                 foregroundState.input = null;
-                foregroundState.output = null;
-                view.container.onmousemove = null;
-                view.container.onmouseup = null;
-                view.container.onmouseleave = null;
+                foregroundState.output = output;
+                foregroundState.line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                foregroundState.line.setAttribute('x1', (output.snap.getBoundingClientRect().left + 8 * view.zoom - foreground.getBoundingClientRect().left).toString());
+                foregroundState.line.setAttribute('y1', (output.snap.getBoundingClientRect().top + 8 * view.zoom - foreground.getBoundingClientRect().top).toString());
+                foregroundState.line.setAttribute('x2', (e.clientX - foreground.getBoundingClientRect().left).toString());
+                foregroundState.line.setAttribute('y2', (e.clientY - foreground.getBoundingClientRect().top).toString());
+                foreground.appendChild(foregroundState.line);
+                view.container.onmousemove = (e) => {
+                    if (!this.node || !this.snap || !foregroundState.line || !output.snap) return;
+                    foregroundState.input = null;
+                    foregroundState.line.setAttribute('x1', (output.snap.getBoundingClientRect().left + 8 * view.zoom - foreground.getBoundingClientRect().left).toString());
+                    foregroundState.line.setAttribute('y1', (output.snap.getBoundingClientRect().top + 8 * view.zoom - foreground.getBoundingClientRect().top).toString());
+                    foregroundState.line.setAttribute('x2', (e.clientX - foreground.getBoundingClientRect().left).toString());
+                    foregroundState.line.setAttribute('y2', (e.clientY - foreground.getBoundingClientRect().top).toString());
+                }
+                view.container.onmouseup = (e) => {
+                    if(foregroundState.input === this){
+                        if(this.connection) this.connection.line.style.opacity = '1';
+                    }else{
+                        if(this.connection) view.deleteConnection(this.connection);
+                        if (foregroundState.input && foregroundState.output) {
+                            const connection = new _Connection(foregroundState.output, foregroundState.input);
+                            view.createConnection(connection);
+                        }
+                    }
+                    foregroundState.line?.remove();
+                    foregroundState.line = null;
+                    if (this.node) this.node.editor.view.move = false;
+                    foregroundState.active = false;
+                    foregroundState.input = null;
+                    foregroundState.output = null;
+                    view.container.onmousemove = null;
+                    view.container.onmouseup = null;
+                    view.container.onmouseleave = null;
+                }
+                view.container.onmouseleave = view.container.onmouseup;
             }
-            view.container.onmouseleave = view.container.onmouseup;
         }
         this.snap.onmousemove = (e) => {
             if (!this.node || !this.snap) return;

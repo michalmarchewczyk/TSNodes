@@ -10,18 +10,22 @@ class _Connection {
     }
 
     setupElement() {
-        this.updatePos();
+        this.updateInputPos();
+        this.updateOutputPos();
     }
 
-    updatePos () {
+    updateInputPos () {
         const view = this.input.node?.editor.view;
         if(!view || !this.output.snap || !this.input.snap) return;
-        const offsetX = view.scrollX/view.zoom - view.container.getBoundingClientRect().left/view.zoom;
-        const offsetY = view.scrollY/view.zoom - view.container.getBoundingClientRect().top/view.zoom;
-        this.line.setAttribute('x1', (this.output.snap.getBoundingClientRect().left/view.zoom + offsetX + 8).toString());
-        this.line.setAttribute('y1', (this.output.snap.getBoundingClientRect().top/view.zoom + offsetY + 8).toString());
-        this.line.setAttribute('x2', (this.input.snap.getBoundingClientRect().left/view.zoom + offsetX + 8).toString());
-        this.line.setAttribute('y2', (this.input.snap.getBoundingClientRect().top/view.zoom + offsetY + 8).toString());
+        this.line.setAttribute('x2', (this.input.snap.getBoundingClientRect().left/view.zoom + view.offsetX + 8).toString());
+        this.line.setAttribute('y2', (this.input.snap.getBoundingClientRect().top/view.zoom + view.offsetY + 8).toString());
+    }
+
+    updateOutputPos () {
+        const view = this.input.node?.editor.view;
+        if(!view || !this.output.snap || !this.input.snap) return;
+        this.line.setAttribute('x1', (this.output.snap.getBoundingClientRect().left/view.zoom + view.offsetX + 8).toString());
+        this.line.setAttribute('y1', (this.output.snap.getBoundingClientRect().top/view.zoom + view.offsetY + 8).toString());
     }
 
     render():SVGLineElement {

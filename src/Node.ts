@@ -169,6 +169,15 @@ abstract class _Node {
         this.connections.push(connection);
     }
 
+    deleteConnection(connection:_Connection) {
+        if(this.connections.includes(connection)){
+            const index = this.connections.indexOf(connection);
+            if(index > -1) {
+                this.connections.splice(index, 1);
+            }
+        }
+    }
+
     render():HTMLElement {
         this.element.style.left = this.nodeBox.pos[0] + 'px';
         this.element.style.top = this.nodeBox.pos[1] + 'px';
@@ -192,7 +201,6 @@ abstract class _Node {
                 e.preventDefault();
                 e.stopPropagation();
                 if (!this.moving) return;
-                this.updateConnections();
                 const deltaX = clientX ? e.clientX - clientX : 0;
                 const deltaY = clientY ? e.clientY - clientY : 0;
                 clientX = e.clientX;
@@ -203,6 +211,7 @@ abstract class _Node {
                 ];
                 this.element.style.left = this.nodeBox.pos[0] + 'px';
                 this.element.style.top = this.nodeBox.pos[1] + 'px';
+                this.updateConnections();
             }
             this.editor.view.container.onmouseup = () => {
                 this.moving = false;
@@ -231,6 +240,7 @@ abstract class _Node {
                     clientX = e.clientX;
                 }
                 this.element.style.width = this.nodeBox.width + 'px';
+                this.updateConnections();
             }
             this.editor.view.container.onmouseup = () => {
                 this.editor.view.container.onmouseleave = null;
@@ -250,6 +260,7 @@ abstract class _Node {
                     clientX = e.clientX;
                 }
                 this.element.style.width = this.nodeBox.width + 'px';
+                this.updateConnections();
             }
             this.editor.view.container.onmouseup = () => {
                 this.editor.view.container.onmouseleave = null;
@@ -261,9 +272,15 @@ abstract class _Node {
     }
 
     private updateConnections() {
+        this.editor.view.offsetX = (this.editor.view.scrollX - this.editor.view.container.getBoundingClientRect().left)/this.editor.view.zoom;
+        this.editor.view.offsetY = (this.editor.view.scrollY - this.editor.view.container.getBoundingClientRect().top)/this.editor.view.zoom;
         this.connections.forEach(connection => {
-            connection.updatePos();
-        })
+            if(connection.input.node === this){
+                connection.updateInputPos();
+            }else if(connection.output.node === this){
+                connection.updateOutputPos();
+            }
+        });
     }
 }
 

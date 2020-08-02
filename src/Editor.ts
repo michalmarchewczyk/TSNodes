@@ -48,7 +48,7 @@ const styles = {
         width: '100%',
         height: '100%',
         '& line': {
-            stroke: 'white',
+            stroke: 'rgba(255,255,255,0.7)',
             strokeWidth: 2,
         }
     },
@@ -120,6 +120,9 @@ class _EditorView {
     public move:boolean = false;
     public zIndex:number = 10;
 
+    public offsetX:number = 0;
+    public offsetY:number = 0;
+
     public graph?:_Graph;
 
     constructor(private editor:_Editor) {
@@ -148,8 +151,22 @@ class _EditorView {
         this.graph?.createConnection(connection);
         connection.input.node?.addConnection(connection);
         connection.output.node?.addConnection(connection);
+        connection.input.connection = connection;
+        this.offsetX = (this.scrollX - this.container.getBoundingClientRect().left)/this.zoom;
+        this.offsetY = (this.scrollY - this.container.getBoundingClientRect().top)/this.zoom;
+        connection.updateInputPos();
+        connection.updateOutputPos();
         const line = connection.render();
         this.background.appendChild(line);
+    }
+
+    deleteConnection(connection:_Connection) {
+        this.graph?.deleteConnection(connection);
+        connection.input.node?.deleteConnection(connection);
+        connection.output.node?.deleteConnection(connection);
+        connection.input.connection = null;
+        const line = connection.render();
+        this.background.removeChild(line);
     }
 
     render():HTMLElement {
@@ -251,6 +268,11 @@ class _EditorView {
         this.graph.nodes.forEach((node) => {
             const nodeElement = node.render();
             this.canvas.appendChild(nodeElement);
+        });
+        this.background.innerHTML = '';
+        this.graph.connections.forEach(connection => {
+            const line = connection.render();
+            this.background.appendChild(line);
         })
     }
 }
