@@ -158,6 +158,18 @@ class _EditorView {
     selectGraph(graph:_Graph) {
         this.graph = graph;
         this.renderGraph();
+        if (this.activeNode) {
+            this.activeNode.element.classList.remove('nodeActive');
+            this.activeNode.active = false;
+            this.activeNode = null;
+        }
+        if (this.selectedNodes.length !== 0) {
+            this.selectedNodes.forEach(node => {
+                node.element.classList.remove('nodeSelected');
+                node.selected = false;
+            });
+            this.selectedNodes = [];
+        }
     }
 
     createNode(node:_Node) {
