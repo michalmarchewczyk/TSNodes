@@ -167,6 +167,9 @@ class _EditorView {
     }
 
     createConnection(connection:_Connection) {
+        if(connection.input.connection){
+            this.deleteConnection(connection.input.connection);
+        }
         this.graph?.createConnection(connection);
         connection.input.node?.addConnection(connection);
         connection.output.node?.addConnection(connection);
