@@ -14,8 +14,6 @@ interface _NodeBox {
     pos:[number, number];
     width:number;
     collapsed:boolean;
-    selected:boolean;
-    active:boolean;
     zIndex:number;
 }
 
@@ -42,6 +40,12 @@ const styles = {
                 top: '-4px',
             }
         },
+        '&.nodeSelected': {
+            outline: '1px solid white',
+        },
+        '&.nodeActive': {
+            outline: '2px solid white',
+        }
     },
     handleLeft: {
         display: 'block',
@@ -114,12 +118,12 @@ abstract class _Node {
         pos: [0, 0],
         width: config.defaultNodeWidth,
         collapsed: false,
-        selected: false,
-        active: false,
         zIndex: 0,
     };
     public element:HTMLElement;
     public moving:boolean = false;
+    public selected:boolean = false;
+    public active:boolean = false;
 
     protected constructor(public editor:_Editor, public name:string) {
         this.element = document.createElement('div');
@@ -186,16 +190,47 @@ abstract class _Node {
         return this.element;
     }
 
+    activate() {
+        if(this.editor.view.activeNode){
+            this.editor.view.activeNode.element.classList.remove('nodeActive');
+            this.editor.view.activeNode.active = false;
+            this.editor.view.activeNode = null;
+        }
+        this.element.classList.add('nodeActive');
+        this.active = true;
+        this.editor.view.activeNode = this;
+    }
+
+    select() {
+        if(!this.editor.view.selectedNodes.includes(this)) this.editor.view.selectedNodes.push(this);
+        this.element.classList.add('nodeSelected');
+        this.selected = true;
+    }
+
+    selectCheck() {
+        if(!this.editor.view.keyboardState.shift){
+            this.editor.view.selectedNodes.forEach(node => {
+                node.element.classList.remove('nodeSelected');
+                node.selected = false;
+            });
+            this.editor.view.selectedNodes = [];
+        }
+    }
+
     private setupNodeControls():void {
         this.element.onmousedown = (e) => {
             this.nodeBox.zIndex = this.editor.view.zIndex + 1;
             this.editor.view.zIndex += 1;
             this.element.style.zIndex = this.nodeBox.zIndex.toString();
             e.preventDefault();
+            e.stopPropagation();
             if (e.button !== 0) return;
             let clientX:number;
             let clientY:number;
             this.moving = true;
+            this.activate();
+            this.selectCheck();
+            this.select();
             this.editor.view.move = true;
             this.editor.view.container.onmousemove = (e) => {
                 e.preventDefault();

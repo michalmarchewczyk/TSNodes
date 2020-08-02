@@ -10,6 +10,7 @@ import config from './config';
 import _Input from './Input';
 import _Output from './Output';
 import _Connection from './Connection';
+import {elementContainsNodes} from './utils';
 
 const styles = {
     view: {
@@ -87,6 +88,11 @@ const styles = {
         '&.graphSelected': {
             fontWeight: 'bold',
         }
+    },
+    selectBox: {
+        display: 'block',
+        position: 'absolute',
+        border: '1px dashed rgba(255,255,255,0.8)',
     }
 }
 
@@ -97,6 +103,12 @@ interface foregroundState {
     output:_Output<any> | null;
     active:boolean;
     line:SVGLineElement | null;
+}
+
+interface keyboardState {
+    shift:boolean;
+    ctrl:boolean;
+    alt:boolean;
 }
 
 
@@ -124,6 +136,13 @@ class _EditorView {
     public offsetY:number = 0;
 
     public graph?:_Graph;
+    public activeNode:_Node | null = null;
+    public selectedNodes:_Node[] = [];
+    public keyboardState:keyboardState = {
+        shift: false,
+        ctrl: false,
+        alt: false,
+    }
 
     constructor(private editor:_Editor) {
         this.container = document.createElement('div');
@@ -152,8 +171,8 @@ class _EditorView {
         connection.input.node?.addConnection(connection);
         connection.output.node?.addConnection(connection);
         connection.input.connection = connection;
-        this.offsetX = (this.scrollX - this.container.getBoundingClientRect().left)/this.zoom;
-        this.offsetY = (this.scrollY - this.container.getBoundingClientRect().top)/this.zoom;
+        this.offsetX = (this.scrollX - this.container.getBoundingClientRect().left) / this.zoom;
+        this.offsetY = (this.scrollY - this.container.getBoundingClientRect().top) / this.zoom;
         connection.updateInputPos();
         connection.updateOutputPos();
         const line = connection.render();
@@ -195,9 +214,13 @@ class _EditorView {
     private setupControls():void {
         this.setupZoom();
         this.setupMove();
+        window.addEventListener('load', () => {
+            this.setupKeyboard();
+        });
+        this.setupSelect();
     }
 
-    private setupMove():void {
+    private setupMove() {
         window.addEventListener('load', () => {
             this.container.scrollLeft = (config.defaultCanvasWidth - this.container.getBoundingClientRect().width) / 2;
             this.container.scrollTop = (config.defaultCanvasHeight - this.container.getBoundingClientRect().height) / 2;
@@ -261,7 +284,85 @@ class _EditorView {
         }
     }
 
-    private renderGraph():void {
+    private setupKeyboard() {
+        document.addEventListener('keydown', (e) => {
+            switch (e.key) {
+                case 'Shift':
+                    this.keyboardState.shift = true;
+                    break;
+                case 'Control':
+                    this.keyboardState.ctrl = true;
+                    break;
+                case 'Alt':
+                    this.keyboardState.alt = true;
+                    break;
+            }
+        });
+        document.addEventListener('keyup', (e) => {
+            switch (e.key) {
+                case 'Shift':
+                    this.keyboardState.shift = false;
+                    break;
+                case 'Control':
+                    this.keyboardState.ctrl = false;
+                    break;
+                case 'Alt':
+                    this.keyboardState.alt = false;
+                    break;
+            }
+        })
+    }
+
+    private setupSelect() {
+        this.canvas.addEventListener('mousedown', (e) => {
+            if (e.button === 0) {
+                if(!this.keyboardState.shift) {
+                    if (this.activeNode) {
+                        this.activeNode.element.classList.remove('nodeActive');
+                        this.activeNode.active = false;
+                        this.activeNode = null;
+                    }
+                    if (this.selectedNodes.length !== 0) {
+                        this.selectedNodes.forEach(node => {
+                            node.element.classList.remove('nodeSelected');
+                            node.selected = false;
+                        });
+                        this.selectedNodes = [];
+                    }
+                }
+                this.move = true;
+                const startX = (this.editor.view.scrollX + e.clientX - this.container.getBoundingClientRect().left) / this.editor.view.zoom;
+                const startY = (this.editor.view.scrollY + e.clientY - this.container.getBoundingClientRect().top) / this.editor.view.zoom;
+                const selectBox = document.createElement('div');
+                this.canvas.appendChild(selectBox);
+                selectBox.className = classes.selectBox;
+                selectBox.style.left = startX + 'px';
+                selectBox.style.top = startY + 'px';
+                selectBox.style.width = '0';
+                selectBox.style.height = '0';
+                this.canvas.onmousemove = (e) => {
+                    const currentX = (this.editor.view.scrollX + e.clientX - this.container.getBoundingClientRect().left) / this.editor.view.zoom;
+                    const currentY = (this.editor.view.scrollY + e.clientY - this.container.getBoundingClientRect().top) / this.editor.view.zoom;
+                    selectBox.style.width = Math.abs(currentX - startX) + 'px';
+                    selectBox.style.height = Math.abs(currentY - startY) + 'px';
+                    selectBox.style.left = Math.min(currentX, startX) + 'px';
+                    selectBox.style.top = Math.min(currentY, startY) + 'px';
+                }
+                this.canvas.onmouseup = (e) => {
+                    const nodes = elementContainsNodes(selectBox, this.graph?.nodes ?? []);
+                    nodes.forEach(node => node.select());
+                    this.move = false;
+                    this.canvas.removeChild(selectBox);
+                    this.canvas.onmousemove = null;
+                    this.canvas.onmouseup = null;
+                    this.canvas.onmouseleave = null;
+                }
+                this.canvas.onmouseleave = this.canvas.onmouseup;
+            }
+        })
+    }
+
+    private renderGraph() {
         this.canvas.innerHTML = '';
         this.canvas.appendChild(this.background);
         if (!this.graph) throw new Error('There is no graph selected');

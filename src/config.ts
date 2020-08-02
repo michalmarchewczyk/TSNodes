@@ -3,7 +3,7 @@ const defaultConfig = {
     defaultCanvasHeight: 4000,
     defaultNodeWidth: 120,
     minNodeWidth: 100,
-    maxNodeWidth: 1240,
+    maxNodeWidth: 240,
     debugOutline: true,
 }
 
