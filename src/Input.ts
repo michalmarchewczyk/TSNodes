@@ -161,12 +161,13 @@ class _Input<T> {
     public node?:_Node;
     public snap?:HTMLElement;
     public connection:_Connection | null = null;
+    public fieldElement?:HTMLElement;
 
-    constructor(public name:string, public defaultValue:T, private elementField:boolean = true, private socket:boolean = true) {
+    constructor(public name:string, public defaultValue:T, public elementField:boolean = true, private socket:boolean = true) {
         this.value = this.defaultValue;
         this.element = document.createElement('div');
-        this.setupElement();
-        if (socket) this.setupSocket();
+        // this.setupElement();
+        // if (socket) this.setupSocket();
     }
 
     setupElement() {
@@ -181,7 +182,8 @@ class _Input<T> {
             this.snap = snap;
         }
         if (this.elementField) {
-            this.element.appendChild(this.renderField());
+            this.fieldElement = this.renderField();
+            this.element.appendChild(this.fieldElement);
         } else {
             const span = document.createElement('span');
             span.innerText = this.name;
@@ -304,14 +306,22 @@ class _Input<T> {
                 (<HTMLInputElement>fieldElement.children[1]).value = <any>this.value;
             }
         }
-        (<HTMLInputElement>fieldElement.children[1]).onchange = () => {
-            this.value = <any>(<HTMLInputElement>fieldElement.children[0].children[2]).value;
+        (<HTMLInputElement>fieldElement.children[1]).oninput = () => {
+            this.value = <any>(<HTMLInputElement>fieldElement.children[1]).value;
             (<HTMLInputElement>fieldElement.children[1]).value = <any>this.value;
         }
         return fieldElement;
     }
 
+    setValue(value:T) {
+        this.value = value;
+        if(!this.fieldElement || !this.elementField) return ;
+        (<HTMLInputElement>this.fieldElement.children[1]).value = <any>this.value;
+    }
+
     render():HTMLElement {
+        this.setupElement();
+        if (this.socket) this.setupSocket();
         return this.element;
     }
 }
@@ -341,7 +351,7 @@ class _InputNumber extends _Input<number> {
                 inputElement.value = this.value.toString();
             }
         }
-        inputElement.onchange = () => {
+        inputElement.oninput = () => {
             this.value = parseInt(inputElement.value, 10);
             this.value = Math.max(this.min, Math.min(this.max, this.value));
             inputElement.value = this.value.toString();
@@ -355,6 +365,12 @@ class _InputNumber extends _Input<number> {
             inputElement.value = this.value.toString();
         }
         return fieldElement;
+    }
+
+    setValue(value:number) {
+        this.value = value;
+        if(!this.fieldElement || !this.elementField) return ;
+        (<HTMLInputElement>this.fieldElement.children[0].children[2]).value = <any>this.value;
     }
 }
 
@@ -387,7 +403,7 @@ class _InputFloat extends _Input<number> {
                 inputElement.value = this.value.toString();
             }
         }
-        inputElement.onchange = () => {
+        inputElement.oninput = () => {
             this.value = parseFloat((<HTMLInputElement>fieldElement.children[0].children[2]).value);
             this.value = Math.max(this.min, Math.min(this.max, this.value));
             this.value = Math.round(this.value * 1000000) / 1000000;
@@ -405,6 +421,12 @@ class _InputFloat extends _Input<number> {
         }
         return fieldElement;
     }
+
+    setValue(value:number) {
+        this.value = value;
+        if(!this.fieldElement || !this.elementField) return ;
+        (<HTMLInputElement>this.fieldElement.children[0].children[2]).value = <any>this.value;
+    }
 }
 
 
@@ -421,7 +443,7 @@ class _InputBoolean extends _Input<boolean> {
         <span>${this.name}</span>
         <input type='checkbox' ${this.value ? 'checked' : ''}>
         `;
-        (<HTMLInputElement>fieldElement.children[1]).onchange = () => {
+        (<HTMLInputElement>fieldElement.children[1]).oninput = () => {
             this.value = (<HTMLInputElement>fieldElement.children[1]).checked;
             (<HTMLInputElement>fieldElement.children[1]).checked = this.value;
         }
@@ -435,6 +457,13 @@ class _InputBoolean extends _Input<boolean> {
         }
         return fieldElement;
     }
+
+    setValue(value:boolean) {
+        this.value = value;
+        if(!this.fieldElement || !this.elementField) return ;
+        (<HTMLInputElement>this.fieldElement.children[1]).checked = this.value;
+    }
+
 }
 
 

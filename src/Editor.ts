@@ -144,6 +144,8 @@ class _EditorView {
         alt: false,
     }
 
+    public clipboard?:_Graph;
+
     constructor(private editor:_Editor) {
         this.container = document.createElement('div');
         this.container.className = classes.view;
@@ -173,13 +175,14 @@ class _EditorView {
     }
 
     createNode(node:_Node) {
-        this.graph?.createNode(node);
+        if (!this.graph) return;
+        this.graph.createNode(node);
         const nodeElement = node.render();
         this.canvas.appendChild(nodeElement);
     }
 
     createConnection(connection:_Connection) {
-        if(connection.input.connection){
+        if (connection.input.connection) {
             this.deleteConnection(connection.input.connection);
         }
         this.graph?.createConnection(connection);
@@ -220,17 +223,77 @@ class _EditorView {
             this.deleteConnection(connection);
         });
         let index = this.graph?.nodes.indexOf(node) ?? -1;
-        if(index > -1){
+        if (index > -1) {
             this.graph?.nodes.splice(index, 1);
         }
-        if(this.activeNode === node){
+        if (this.activeNode === node) {
             this.activeNode = null;
         }
         this.canvas.removeChild(node.render());
         index = this.selectedNodes.indexOf(node) ?? -1;
-        if(index > -1){
+        if (index > -1) {
             this.selectedNodes.splice(index, 1);
         }
+    }
+
+    copyNodes(nodes:_Node[]) {
+        console.log('COPY');
+        if(!this.clipboard) return;
+        this.clipboard.nodes = [];
+        this.clipboard.connections = [];
+
+        const newNodes:_Node[] = [];
+        const newConnections:_Connection[] = [];
+        const connections:_Connection[] = [];
+        const nodesMap = new Map();
+
+        nodes.forEach(node => {
+            let newNode:_Node;
+            // newNode = new _Node(this.editor, node.name);
+            newNode = new (Object.getPrototypeOf(node).constructor)();
+            newNode.nodeBox.pos = [node.nodeBox.pos[0], node.nodeBox.pos[1]];
+            newNode.nodeBox.width = node.nodeBox.width;
+            newNode.inputs.forEach((input, index) => {
+                input.node = newNode;
+                input.setValue(node.inputs[index].value);
+            });
+            newNode.setName(newNode.name + ' new');
+            node.connections.forEach(connection => {
+                // console.log(connection);
+                if (!connection.input.node || !connection.output.node) return;
+                if (nodes.includes(connection.input.node) && nodes.includes(connection.output.node)) {
+                    if (!connections.includes(connection)) {
+                        connections.push(connection);
+                    }
+                }
+            });
+            newNodes.push(newNode);
+            nodesMap.set(node, newNode);
+        });
+
+        connections.forEach(connection => {
+            if (!connection.input.node || !connection.output.node) return;
+            const inputNode = nodesMap.get(connection.input.node);
+            const input = inputNode.inputs[connection.input.node.inputs.indexOf(connection.input)];
+            const outputNode = nodesMap.get(connection.output.node);
+            const output = outputNode.outputs[connection.output.node.outputs.indexOf(connection.output)];
+            const newConnection = new _Connection(output, input);
+            newConnections.push(newConnection);
+        });
+
+        newNodes.forEach(newNode => {
+            if(!this.clipboard) return;
+            this.clipboard.createNode(newNode);
+        });
+
+        newConnections.forEach(newConnection => {
+            if(!this.clipboard) return;
+            this.clipboard.createConnection(newConnection);
+            newConnection.input.node?.addConnection(newConnection);
+            newConnection.output.node?.addConnection(newConnection);
+            newConnection.input.connection = newConnection;
+        });
+
     }
 
     render():HTMLElement {
@@ -355,60 +418,63 @@ class _EditorView {
                     this.keyboardState.alt = false;
                     break;
             }
-            if(e.key === 'Delete'){
+            if (e.key === 'Delete') {
                 this.deleteNodes(this.selectedNodes);
+            }
+            if (e.key === 'c' && this.keyboardState.ctrl) {
+                this.copyNodes(this.selectedNodes);
             }
         })
     }
 
     private setupSelect() {
         this.canvas.addEventListener('mousedown', (e) => {
-            if (e.button === 0) {
-                if(!this.keyboardState.shift) {
-                    if (this.activeNode) {
-                        this.activeNode.element.classList.remove('nodeActive');
-                        this.activeNode.active = false;
-                        this.activeNode = null;
-                    }
-                    if (this.selectedNodes.length !== 0) {
-                        this.selectedNodes.forEach(node => {
-                            node.element.classList.remove('nodeSelected');
-                            node.selected = false;
-                        });
-                        this.selectedNodes = [];
-                    }
+            if (e.button !== 0) return;
+
+            if (!this.keyboardState.shift) {
+                if (this.activeNode) {
+                    this.activeNode.element.classList.remove('nodeActive');
+                    this.activeNode.active = false;
+                    this.activeNode = null;
                 }
-                this.move = true;
-                const startX = (this.editor.view.scrollX + e.clientX - this.container.getBoundingClientRect().left) / this.editor.view.zoom;
-                const startY = (this.editor.view.scrollY + e.clientY - this.container.getBoundingClientRect().top) / this.editor.view.zoom;
-                const selectBox = document.createElement('div');
-                this.canvas.appendChild(selectBox);
-                selectBox.className = classes.selectBox;
-                selectBox.style.left = startX + 'px';
-                selectBox.style.top = startY + 'px';
-                selectBox.style.width = '0';
-                selectBox.style.height = '0';
-                selectBox.style.zIndex = this.zIndex.toString();
-                this.zIndex = this.zIndex + 1;
-                this.canvas.onmousemove = (e) => {
-                    const currentX = (this.editor.view.scrollX + e.clientX - this.container.getBoundingClientRect().left) / this.editor.view.zoom;
-                    const currentY = (this.editor.view.scrollY + e.clientY - this.container.getBoundingClientRect().top) / this.editor.view.zoom;
-                    selectBox.style.width = Math.abs(currentX - startX) + 'px';
-                    selectBox.style.height = Math.abs(currentY - startY) + 'px';
-                    selectBox.style.left = Math.min(currentX, startX) + 'px';
-                    selectBox.style.top = Math.min(currentY, startY) + 'px';
+                if (this.selectedNodes.length !== 0) {
+                    this.selectedNodes.forEach(node => {
+                        node.element.classList.remove('nodeSelected');
+                        node.selected = false;
+                    });
+                    this.selectedNodes = [];
                 }
-                this.canvas.onmouseup = (e) => {
-                    const nodes = elementContainsNodes(selectBox, this.graph?.nodes ?? []);
-                    nodes.forEach(node => node.select());
-                    this.move = false;
-                    this.canvas.removeChild(selectBox);
-                    this.canvas.onmousemove = null;
-                    this.canvas.onmouseup = null;
-                    this.canvas.onmouseleave = null;
-                }
-                this.canvas.onmouseleave = this.canvas.onmouseup;
             }
+            this.move = true;
+            const startX = (this.editor.view.scrollX + e.clientX - this.container.getBoundingClientRect().left) / this.editor.view.zoom;
+            const startY = (this.editor.view.scrollY + e.clientY - this.container.getBoundingClientRect().top) / this.editor.view.zoom;
+            const selectBox = document.createElement('div');
+            this.canvas.appendChild(selectBox);
+            selectBox.className = classes.selectBox;
+            selectBox.style.left = startX + 'px';
+            selectBox.style.top = startY + 'px';
+            selectBox.style.width = '0';
+            selectBox.style.height = '0';
+            selectBox.style.zIndex = this.zIndex.toString();
+            this.zIndex = this.zIndex + 1;
+            this.canvas.onmousemove = (e) => {
+                const currentX = (this.editor.view.scrollX + e.clientX - this.container.getBoundingClientRect().left) / this.editor.view.zoom;
+                const currentY = (this.editor.view.scrollY + e.clientY - this.container.getBoundingClientRect().top) / this.editor.view.zoom;
+                selectBox.style.width = Math.abs(currentX - startX) + 'px';
+                selectBox.style.height = Math.abs(currentY - startY) + 'px';
+                selectBox.style.left = Math.min(currentX, startX) + 'px';
+                selectBox.style.top = Math.min(currentY, startY) + 'px';
+            }
+            this.canvas.onmouseup = (e) => {
+                const nodes = elementContainsNodes(selectBox, this.graph?.nodes ?? []);
+                nodes.forEach(node => node.select());
+                this.move = false;
+                this.canvas.removeChild(selectBox);
+                this.canvas.onmousemove = null;
+                this.canvas.onmouseup = null;
+                this.canvas.onmouseleave = null;
+            }
+            this.canvas.onmouseleave = this.canvas.onmouseup;
         })
     }
 
@@ -423,6 +489,10 @@ class _EditorView {
         this.background.innerHTML = '';
         this.graph.connections.forEach(connection => {
             const line = connection.render();
+            this.offsetX = (this.scrollX - this.container.getBoundingClientRect().left) / this.zoom;
+            this.offsetY = (this.scrollY - this.container.getBoundingClientRect().top) / this.zoom;
+            connection.updateInputPos();
+            connection.updateOutputPos();
             this.background.appendChild(line);
         })
     }
@@ -522,6 +592,15 @@ class _EditorInfo {
     constructor(private editor:_Editor) {
         this.container = document.createElement('div');
         this.container.innerHTML = 'info';
+        this.setupElement();
+    }
+
+    setupElement() {
+
+    }
+
+    update() {
+
     }
 
     render():HTMLElement {
@@ -541,16 +620,18 @@ class _Editor {
         this.graphs = new _EditorGraphs(this);
         this.nodes = new _EditorNodes(this);
         this.info = new _EditorInfo(this);
+        this.view.clipboard = this.createGraph('clipboard');
     }
 
     addNode(node:nodeClass):void {
         this.nodes?.addNode(node);
     }
 
-    createGraph(name:string) {
+    createGraph(name:string):_Graph {
         const graph = new _Graph(name);
         this.graphs?.addGraph(graph);
         this.selectGraph(graph);
+        return graph;
     }
 
     selectGraph(graph:_Graph) {

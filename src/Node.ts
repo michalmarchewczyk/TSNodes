@@ -38,6 +38,17 @@ const styles = {
                 borderWidth: '6px 0 6px 10px',
                 borderColor: 'transparent transparent transparent white',
                 top: '-4px',
+            },
+            '& $nodeContainer': {
+                visibility: 'hidden',
+                marginTop: 5,
+                '& div': {
+                    height: 0,
+                    minHeight: 0,
+                    maxHeight: 0,
+                    marginTop: 0,
+                    marginBottom: 0,
+                }
             }
         },
         '&.nodeSelected': {
@@ -132,29 +143,44 @@ abstract class _Node {
 
     setupElement():void {
         this.element.className = classes.node;
+
         const leftHandle = document.createElement('div');
         leftHandle.className = classes.handleLeft;
         this.element.appendChild(leftHandle);
+
         const rightHandle = document.createElement('div');
         rightHandle.className = classes.handleRight;
         this.element.appendChild(rightHandle);
+
         this.setupNodeControls();
+
         const name = document.createElement('div');
         name.className = classes.name;
         name.innerHTML = `<button></button><span>${this.name}</span>`;
         (<HTMLElement>name.children[0]).onclick = () => {
-            if (this.nodeBox.collapsed) {
-                this.nodeBox.collapsed = false;
-                this.element.classList.remove('nodeCollapsed');
-            } else {
-                this.nodeBox.collapsed = true;
-                this.element.classList.add('nodeCollapsed');
-            }
+            this.collapse();
         }
         this.element.appendChild(name);
+
         const nodeContainer = document.createElement('div');
         nodeContainer.className = classes.nodeContainer;
         this.element.appendChild(nodeContainer);
+    }
+
+    setName(name:string) {
+        this.name = name;
+        (<HTMLElement>this.element.children[2].children[1]).innerText = this.name;
+    }
+
+    collapse(collapse?:boolean) {
+        if(collapse === true || !this.nodeBox.collapsed){
+            this.nodeBox.collapsed = true;
+            this.element.classList.add('nodeCollapsed');
+        }else{
+            this.nodeBox.collapsed = false;
+            this.element.classList.remove('nodeCollapsed');
+        }
+        this.updateConnections();
     }
 
     addInput(input:_Input<any>) {
@@ -183,6 +209,7 @@ abstract class _Node {
     }
 
     render():HTMLElement {
+
         this.element.style.left = this.nodeBox.pos[0] + 'px';
         this.element.style.top = this.nodeBox.pos[1] + 'px';
         this.element.style.width = this.nodeBox.width + 'px';
@@ -232,15 +259,20 @@ abstract class _Node {
             this.nodeBox.zIndex = this.editor.view.zIndex + 1;
             this.editor.view.zIndex += 1;
             this.element.style.zIndex = this.nodeBox.zIndex.toString();
+
             e.preventDefault();
             e.stopPropagation();
+
             if (e.button !== 0) return;
+
             let clientX:number;
             let clientY:number;
             this.moving = true;
+
             this.activate();
             this.selectCheck();
             this.select();
+
             this.editor.view.move = true;
             this.editor.view.container.onmousemove = (e) => {
                 e.preventDefault();
@@ -261,11 +293,17 @@ abstract class _Node {
             }
             this.editor.view.container.onmouseleave = this.editor.view.container.onmouseup;
         }
+        this.setupLeftHandle();
+        this.setupRightHandle();
+    }
+
+    private setupLeftHandle() {
         const leftHandle = <HTMLElement>this.element.children[0];
-        const rightHandle = <HTMLElement>this.element.children[1];
+
         leftHandle.onmousedown = (e) => {
             e.stopPropagation();
             e.preventDefault();
+
             let clientX:number;
             this.editor.view.container.onmousemove = (e) => {
                 const deltaX = clientX ? clientX - e.clientX : 0;
@@ -288,9 +326,15 @@ abstract class _Node {
             }
             this.editor.view.container.onmouseleave = this.editor.view.container.onmouseup;
         }
+    }
+
+    private setupRightHandle() {
+        const rightHandle = <HTMLElement>this.element.children[1];
+
         rightHandle.onmousedown = (e) => {
             e.stopPropagation();
             e.preventDefault();
+
             let clientX:number;
             this.editor.view.container.onmousemove = (e) => {
                 const deltaX = clientX ? e.clientX - clientX : 0;

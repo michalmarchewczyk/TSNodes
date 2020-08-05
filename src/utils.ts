@@ -9,9 +9,9 @@ export const elementContainsPoint = (element:HTMLElement, x:number, y:number):bo
 
 export const elementContainsNodes = (element:HTMLElement, nodes:_Node[]):_Node[] => {
     nodes = nodes.filter(node => {
-        let centerX = node.element.getBoundingClientRect().left + (node.element.getBoundingClientRect().width)/2;
-        let centerY = node.element.getBoundingClientRect().top + (node.element.getBoundingClientRect().height)/2;
-        let contains = elementContainsPoint(element, centerX, centerY);
+        const centerX = node.element.getBoundingClientRect().left + (node.element.getBoundingClientRect().width)/2;
+        const centerY = node.element.getBoundingClientRect().top + (node.element.getBoundingClientRect().height)/2;
+        const contains = elementContainsPoint(element, centerX, centerY);
         return contains;
     })
     return nodes;
