@@ -377,8 +377,7 @@ class _EditorView {
 
     private setupMove() {
         window.addEventListener('load', () => {
-            this.container.scrollLeft = (config.defaultCanvasWidth - this.container.getBoundingClientRect().width) / 2;
-            this.container.scrollTop = (config.defaultCanvasHeight - this.container.getBoundingClientRect().height) / 2;
+            this.container.scrollTo((config.defaultCanvasWidth - this.container.getBoundingClientRect().width) / 2, (config.defaultCanvasHeight - this.container.getBoundingClientRect().height) / 2);
             this.scrollX = this.container.scrollLeft;
             this.scrollY = this.container.scrollTop;
         });
@@ -410,8 +409,7 @@ class _EditorView {
                 clientX = e.clientX;
                 clientY = e.clientY;
 
-                this.container.scrollLeft = this.scrollX + deltaX;
-                this.container.scrollTop = this.scrollY + deltaY;
+                this.container.scrollTo(this.scrollX + deltaX, this.scrollY + deltaY);
                 this.scrollX = this.container.scrollLeft;
                 this.scrollY = this.container.scrollTop;
             }
