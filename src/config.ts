@@ -4,7 +4,7 @@ const defaultConfig = {
     defaultNodeWidth: 120,
     minNodeWidth: 100,
     maxNodeWidth: 240,
-    debugOutline: true,
+    debug: true,
 }
 
 const config = {

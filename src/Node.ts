@@ -26,7 +26,7 @@ const styles = {
         display: 'block',
         position: 'absolute',
         background: '#777777',
-        outline: (config.debugOutline) ? '1px solid blue' : 'none',
+        outline: (config.debug) ? '1px solid blue' : 'none',
         minHeight: 40,
         height: 'auto',
         '&.nodeCollapsed': {
@@ -65,7 +65,7 @@ const styles = {
         left: -8,
         width: 16,
         height: 'calc(100% - 20px)',
-        outline: (config.debugOutline) ? '1px solid green' : 'none',
+        outline: (config.debug) ? '1px solid green' : 'none',
         cursor: 'ew-resize',
         zIndex: 20,
     },
@@ -76,7 +76,7 @@ const styles = {
         right: -8,
         width: 16,
         height: 'calc(100% - 20px)',
-        outline: (config.debugOutline) ? '1px solid green' : 'none',
+        outline: (config.debug) ? '1px solid green' : 'none',
         cursor: 'ew-resize',
         zIndex: 20,
     },
@@ -113,7 +113,7 @@ const styles = {
         left: 0,
         width: '100%',
         height: 'auto',
-        outline: (config.debugOutline) ? '2px solid orange' : 'none',
+        outline: (config.debug) ? '2px solid orange' : 'none',
         zIndex: 30,
     }
 }

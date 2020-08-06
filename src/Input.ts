@@ -16,7 +16,7 @@ const styles = {
         minHeight: 20,
         height: 20,
         maxHeight: 20,
-        outline: (config.debugOutline) ? '1px solid red' : 'none',
+        outline: (config.debug) ? '1px solid red' : 'none',
         marginTop: 5,
         marginBottom: 5,
         paddingLeft: 10,
@@ -29,7 +29,7 @@ const styles = {
         left: -8,
         width: 16,
         height: 16,
-        outline: (config.debugOutline) ? '1px solid cyan' : 'none',
+        outline: (config.debug) ? '1px solid cyan' : 'none',
     },
     dot: {
         display: 'block',

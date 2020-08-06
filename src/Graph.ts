@@ -40,4 +40,17 @@ class _Graph {
     }
 }
 
+
+class _GraphClipboard extends _Graph {
+    public center:[number,number] = [0,0];
+
+    constructor() {
+        super('clipboard');
+    }
+}
+
 export default _Graph;
+
+export {
+    _GraphClipboard
+}

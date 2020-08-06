@@ -1,4 +1,4 @@
-import _Graph from './Graph';
+import _Graph, {_GraphClipboard} from './Graph';
 import _Node, {nodeClass} from './Node';
 
 import jss from 'jss';
@@ -10,7 +10,7 @@ import config from './config';
 import _Input from './Input';
 import _Output from './Output';
 import _Connection from './Connection';
-import {elementContainsNodes} from './utils';
+import {elementContainsNodes, nodePosAverage} from './utils';
 
 const styles = {
     view: {
@@ -74,7 +74,7 @@ const styles = {
         left: 0,
         width: '100%',
         height: '40px',
-        outline: (config.debugOutline) ? '1px solid red' : 'none',
+        outline: (config.debug) ? '1px solid red' : 'none',
         cursor: 'pointer',
     },
     graphElement: {
@@ -84,7 +84,7 @@ const styles = {
         left: 0,
         width: '100%',
         height: '40px',
-        outline: (config.debugOutline) ? '1px solid red' : 'none',
+        outline: (config.debug) ? '1px solid red' : 'none',
         '&.graphSelected': {
             fontWeight: 'bold',
         }
@@ -144,7 +144,7 @@ class _EditorView {
         alt: false,
     }
 
-    public clipboard?:_Graph;
+    public clipboard?:_GraphClipboard;
 
     constructor(private editor:_Editor) {
         this.container = document.createElement('div');
@@ -236,11 +236,8 @@ class _EditorView {
         }
     }
 
-    copyNodes(nodes:_Node[]) {
-        console.log('COPY');
-        if(!this.clipboard) return;
-        this.clipboard.nodes = [];
-        this.clipboard.connections = [];
+    cloneNodes(nodes:_Node[]):[_Node[],_Connection[]] {
+        console.log('CLONE');
 
         const newNodes:_Node[] = [];
         const newConnections:_Connection[] = [];
@@ -257,7 +254,7 @@ class _EditorView {
                 input.node = newNode;
                 input.setValue(node.inputs[index].value);
             });
-            newNode.setName(newNode.name + ' new');
+            newNode.setName(node.name);
             node.connections.forEach(connection => {
                 // console.log(connection);
                 if (!connection.input.node || !connection.output.node) return;
@@ -281,6 +278,17 @@ class _EditorView {
             newConnections.push(newConnection);
         });
 
+        return [newNodes, newConnections];
+    }
+
+    copyNodes(nodes:_Node[]) {
+        console.log('COPY');
+        if(!this.clipboard) return;
+        this.clipboard.nodes = [];
+        this.clipboard.connections = [];
+
+        const [newNodes, newConnections] = this.cloneNodes(nodes);
+
         newNodes.forEach(newNode => {
             if(!this.clipboard) return;
             this.clipboard.createNode(newNode);
@@ -293,6 +301,45 @@ class _EditorView {
             newConnection.output.node?.addConnection(newConnection);
             newConnection.input.connection = newConnection;
         });
+        this.clipboard.center = nodePosAverage(nodes);
+    }
+
+    pasteNodes(nodes:_Node[]) {
+        console.log('PASTE');
+
+        if(!this.clipboard) return;
+
+        const [newNodes, newConnections] = this.cloneNodes(nodes);
+
+        const deltaX = (this.scrollX + this.container.getBoundingClientRect().width/2) / this.zoom - this.clipboard.center[0] - 20;
+        const deltaY = (this.scrollY + this.container.getBoundingClientRect().height/2) / this.zoom - this.clipboard.center[1] - 20;
+
+        if (this.activeNode) {
+            this.activeNode.element.classList.remove('nodeActive');
+            this.activeNode.active = false;
+            this.activeNode = null;
+        }
+        if (this.selectedNodes.length !== 0) {
+            this.selectedNodes.forEach(node => {
+                node.element.classList.remove('nodeSelected');
+                node.selected = false;
+            });
+            this.selectedNodes = [];
+        }
+
+        newNodes.forEach(node => {
+            this.editor.createNode(node);
+            node.nodeBox.zIndex = this.zIndex;
+            node.element.style.zIndex = node.nodeBox.zIndex.toString();
+            this.zIndex = this.zIndex + 1;
+            node.select();
+            node.move(deltaX, deltaY);
+        });
+
+        newConnections.forEach(newConnection => {
+            this.createConnection(newConnection);
+        });
+
 
     }
 
@@ -424,6 +471,11 @@ class _EditorView {
             if (e.key === 'c' && this.keyboardState.ctrl) {
                 this.copyNodes(this.selectedNodes);
             }
+            if (e.key === 'v' && this.keyboardState.ctrl) {
+                if(this.clipboard) {
+                    this.pasteNodes(this.clipboard.nodes);
+                }
+            }
         })
     }
 
@@ -506,7 +558,7 @@ class _EditorGraphs {
 
     constructor(private editor:_Editor) {
         this.container = document.createElement('div');
-        this.container.innerHTML = 'graphs';
+        if(config.debug) this.container.innerHTML = 'graphs';
         this.editor = editor;
     }
 
@@ -549,7 +601,7 @@ class _EditorNodes {
 
     constructor(private editor:_Editor) {
         this.container = document.createElement('div');
-        this.container.innerHTML = 'nodes';
+        if(config.debug) this.container.innerHTML = 'nodes';
     }
 
     addNode(node:nodeClass) {
@@ -591,7 +643,7 @@ class _EditorInfo {
 
     constructor(private editor:_Editor) {
         this.container = document.createElement('div');
-        this.container.innerHTML = 'info';
+        if(config.debug) this.container.innerHTML = 'info';
         this.setupElement();
     }
 
@@ -620,7 +672,8 @@ class _Editor {
         this.graphs = new _EditorGraphs(this);
         this.nodes = new _EditorNodes(this);
         this.info = new _EditorInfo(this);
-        this.view.clipboard = this.createGraph('clipboard');
+        this.view.clipboard = new _GraphClipboard();
+        if(config.debug) this.graphs?.addGraph(this.view.clipboard);
     }
 
     addNode(node:nodeClass):void {
