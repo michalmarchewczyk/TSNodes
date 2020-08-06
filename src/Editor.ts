@@ -304,6 +304,12 @@ class _EditorView {
         this.clipboard.center = nodePosAverage(nodes);
     }
 
+    cutNodes(nodes:_Node[]) {
+        console.log('CUT');
+        this.copyNodes(nodes);
+        this.deleteNodes(nodes);
+    }
+
     pasteNodes(nodes:_Node[]) {
         console.log('PASTE');
 
@@ -341,6 +347,12 @@ class _EditorView {
         });
 
 
+    }
+
+    duplicateNodes(nodes:_Node[]) {
+        if(!this.clipboard) return;
+        this.copyNodes(nodes);
+        this.pasteNodes(this.clipboard.nodes);
     }
 
     render():HTMLElement {
@@ -483,10 +495,10 @@ class _EditorView {
                 }
             }
             if (e.key === 'd' && this.keyboardState.ctrl) {
-                if(this.clipboard) {
-                    this.copyNodes(this.selectedNodes);
-                    this.pasteNodes(this.clipboard.nodes);
-                }
+                this.duplicateNodes(this.selectedNodes);
+            }
+            if (e.key === 'x' && this.keyboardState.ctrl){
+                this.cutNodes(this.selectedNodes);
             }
         })
     }
