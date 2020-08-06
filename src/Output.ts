@@ -53,26 +53,24 @@ class _Output<T> {
     public node?:_Node;
     public snap?:HTMLElement;
 
-    constructor(name:string, fn:_OutputFn<T>, private socket:boolean = true) {
+    constructor(name:string, fn:_OutputFn<T>, private visible:boolean = true) {
         this.name = name;
         this.fn = fn;
         this.element = document.createElement('div');
         this.setupElement();
-        if (socket) this.setupSocket();
+        this.setupSocket();
     }
 
     setupElement() {
         this.element.className = classes.outputElement;
         this.element.innerText = this.name;
-        if (this.socket) {
-            const snap = document.createElement('div');
-            snap.className = classes.snap;
-            const dot = document.createElement('div');
-            dot.className = classes.dot;
-            snap.appendChild(dot);
-            this.element.appendChild(snap);
-            this.snap = snap;
-        }
+        const snap = document.createElement('div');
+        snap.className = classes.snap;
+        const dot = document.createElement('div');
+        dot.className = classes.dot;
+        snap.appendChild(dot);
+        this.element.appendChild(snap);
+        this.snap = snap;
     }
 
     setupSocket() {
@@ -135,6 +133,7 @@ class _Output<T> {
     }
 
     render():HTMLElement {
+        if(!this.visible) return document.createElement('div');
         return this.element;
     }
 }
