@@ -450,6 +450,10 @@ class _EditorView {
                     this.keyboardState.alt = true;
                     break;
             }
+            if(this.keyboardState.ctrl){
+                e.preventDefault();
+                e.stopPropagation();
+            }
         });
         document.addEventListener('keyup', (e) => {
             switch (e.key) {
@@ -463,6 +467,10 @@ class _EditorView {
                     this.keyboardState.alt = false;
                     break;
             }
+            if(this.keyboardState.ctrl){
+                e.preventDefault();
+                e.stopPropagation();
+            }
             if (e.key === 'Delete') {
                 this.deleteNodes(this.selectedNodes);
             }
@@ -471,6 +479,12 @@ class _EditorView {
             }
             if (e.key === 'v' && this.keyboardState.ctrl) {
                 if(this.clipboard) {
+                    this.pasteNodes(this.clipboard.nodes);
+                }
+            }
+            if (e.key === 'd' && this.keyboardState.ctrl) {
+                if(this.clipboard) {
+                    this.copyNodes(this.selectedNodes);
                     this.pasteNodes(this.clipboard.nodes);
                 }
             }
