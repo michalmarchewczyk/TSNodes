@@ -46,12 +46,18 @@ const {classes} = jss.createStyleSheet(styles).attach();
 
 type _OutputFn<T> = (inputs:any[]) => T;
 
+interface outputValue<T> {
+    index:number,
+    value:T,
+}
+
 class _Output<T> {
     public name:string;
     public fn:_OutputFn<T>;
     public element:HTMLElement;
     public node?:_Node;
     public snap?:HTMLElement;
+    public value?:outputValue<T>;
 
     constructor(name:string, fn:_OutputFn<T>, private visible:boolean = true) {
         this.name = name;
