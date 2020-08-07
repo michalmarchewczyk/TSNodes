@@ -160,7 +160,7 @@ class _Input<T> {
     public element:HTMLElement;
     public node?:_Node;
     public snap?:HTMLElement;
-    public connection:_Connection | null = null;
+    public _connection:_Connection | null = null;
     public fieldElement?:HTMLElement;
 
     constructor(public name:string, public defaultValue:T, public elementField:boolean = true, private socket:boolean = true) {
@@ -168,6 +168,15 @@ class _Input<T> {
         this.element = document.createElement('div');
         // this.setupElement();
         // if (socket) this.setupSocket();
+    }
+
+    get connection():(_Connection|null) {
+        return this._connection;
+    }
+
+    set connection(connection:_Connection|null){
+        this._connection = connection;
+        this.refresh();
     }
 
     setupElement() {
@@ -188,6 +197,22 @@ class _Input<T> {
             const span = document.createElement('span');
             span.innerText = this.name;
             this.element.appendChild(span);
+        }
+    }
+
+    refresh() {
+        if(this.elementField && !this._connection){
+            if(this.fieldElement && !this.element.contains(this.fieldElement)){
+                this.element.removeChild(this.element.children[1]);
+                this.element.appendChild(this.fieldElement);
+            }
+        }else{
+            if(this.fieldElement){
+                this.element.removeChild(this.fieldElement);
+                const span = document.createElement('span');
+                span.innerText = this.name;
+                this.element.appendChild(span);
+            }
         }
     }
 
