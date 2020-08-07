@@ -207,9 +207,13 @@ class _EditorView {
     }
 
     moveNodes(deltaX:number, deltaY:number) {
-        this.selectedNodes.forEach(node => {
-            node.move(deltaX, deltaY);
-        });
+        this.offsetX = (this.scrollX - this.container.getBoundingClientRect().left)/this.zoom;
+        this.offsetY = (this.scrollY - this.container.getBoundingClientRect().top)/this.zoom;
+        window.requestAnimationFrame(() => {
+            this.selectedNodes.forEach(node => {
+                node.move(deltaX, deltaY);
+            });
+        })
     }
 
     deleteNodes(nodes:_Node[]) {

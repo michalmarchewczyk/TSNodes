@@ -180,6 +180,8 @@ abstract class _Node {
             this.nodeBox.collapsed = false;
             this.element.classList.remove('nodeCollapsed');
         }
+        this.editor.view.offsetX = (this.editor.view.scrollX - this.editor.view.container.getBoundingClientRect().left)/this.editor.view.zoom;
+        this.editor.view.offsetY = (this.editor.view.scrollY - this.editor.view.container.getBoundingClientRect().top)/this.editor.view.zoom;
         this.updateConnections();
     }
 
@@ -251,7 +253,8 @@ abstract class _Node {
         ];
         this.element.style.left = this.nodeBox.pos[0] + 'px';
         this.element.style.top = this.nodeBox.pos[1] + 'px';
-        this.updateConnections();
+        // this.updateConnections();
+        this.moveConnections(deltaX, deltaY);
     }
 
     private setupNodeControls():void {
@@ -304,6 +307,9 @@ abstract class _Node {
             e.stopPropagation();
             e.preventDefault();
 
+            this.editor.view.offsetX = (this.editor.view.scrollX - this.editor.view.container.getBoundingClientRect().left)/this.editor.view.zoom;
+            this.editor.view.offsetY = (this.editor.view.scrollY - this.editor.view.container.getBoundingClientRect().top)/this.editor.view.zoom;
+
             let clientX:number;
             this.editor.view.container.onmousemove = (e) => {
                 const deltaX = clientX ? clientX - e.clientX : 0;
@@ -335,6 +341,9 @@ abstract class _Node {
             e.stopPropagation();
             e.preventDefault();
 
+            this.editor.view.offsetX = (this.editor.view.scrollX - this.editor.view.container.getBoundingClientRect().left)/this.editor.view.zoom;
+            this.editor.view.offsetY = (this.editor.view.scrollY - this.editor.view.container.getBoundingClientRect().top)/this.editor.view.zoom;
+
             let clientX:number;
             this.editor.view.container.onmousemove = (e) => {
                 const deltaX = clientX ? e.clientX - clientX : 0;
@@ -355,15 +364,30 @@ abstract class _Node {
     }
 
     private updateConnections() {
-        this.editor.view.offsetX = (this.editor.view.scrollX - this.editor.view.container.getBoundingClientRect().left)/this.editor.view.zoom;
-        this.editor.view.offsetY = (this.editor.view.scrollY - this.editor.view.container.getBoundingClientRect().top)/this.editor.view.zoom;
         this.connections.forEach(connection => {
             if(connection.input.node === this){
-                connection.updateInputPos();
+                connection.getInputPos();
             }else if(connection.output.node === this){
-                connection.updateOutputPos();
+                connection.getOutputPos();
+            }
+        })
+        this.connections.forEach(connection => {
+            if(connection.input.node === this){
+                connection.setInputPos();
+            }else if(connection.output.node === this){
+                connection.setOutputPos();
             }
         });
+    }
+
+    private moveConnections(deltaX:number, deltaY:number) {
+        this.connections.forEach(connection => {
+            if(connection.input.node === this){
+                connection.moveInputPos(deltaX, deltaY);
+            }else if(connection.output.node === this){
+                connection.moveOutputPos(deltaX, deltaY);
+            }
+        })
     }
 }
 
