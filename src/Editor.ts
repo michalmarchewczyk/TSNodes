@@ -4,13 +4,16 @@ import _Node, {nodeClass} from './Node';
 import jss from 'jss';
 import preset from 'jss-preset-default';
 
-jss.setup(preset());
-
 import config from './config';
 import _Input from './Input';
 import _Output from './Output';
 import _Connection from './Connection';
 import {elementContainsNodes, nodePosAverage} from './utils';
+import _Engine from './Engine';
+
+
+jss.setup(preset());
+
 
 const styles = {
     view: {
@@ -195,6 +198,11 @@ class _EditorView {
         connection.updateOutputPos();
         const line = connection.render();
         this.background.appendChild(line);
+        if(!connection.output.node) return;
+        const checkRecursion = this.editor.engine.checkNode(connection.output.node);
+        if(checkRecursion){
+            this.deleteConnection(connection);
+        }
     }
 
     deleteConnection(connection:_Connection) {
@@ -226,7 +234,7 @@ class _EditorView {
         node.connections.slice().forEach(connection => {
             this.deleteConnection(connection);
         });
-        let index = this.graph?.nodes.indexOf(node) ?? -1;
+        let index:number = this.graph?.nodes.indexOf(node) ?? -1;
         if (index > -1) {
             this.graph?.nodes.splice(index, 1);
         }
@@ -440,7 +448,7 @@ class _EditorView {
 
             const oldZoom = this.zoom;
             this.zoom = this.zoom - Math.sign(e.deltaY) * 0.1;
-            this.zoom = Math.min(Math.max(0.6, this.zoom), 2)
+            this.zoom = Math.min(Math.max(config.zoomMin, this.zoom), config.zoomMax)
             this.canvas.style.transform = `scale(${this.zoom})`;
             const rescale = this.zoom / oldZoom - 1;
 
@@ -694,12 +702,14 @@ class _Editor {
     public graphs:_EditorGraphs;
     public nodes:_EditorNodes;
     public info:_EditorInfo;
+    public engine:_Engine;
 
     constructor() {
         this.view = new _EditorView(this);
         this.graphs = new _EditorGraphs(this);
         this.nodes = new _EditorNodes(this);
         this.info = new _EditorInfo(this);
+        this.engine = new _Engine();
         this.view.clipboard = new _GraphClipboard();
         if(config.debug) this.graphs?.addGraph(this.view.clipboard);
     }

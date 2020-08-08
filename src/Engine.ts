@@ -41,6 +41,36 @@ class _Engine {
         }
         return output.value.value;
     }
+
+    checkNode(node:_Node):boolean {
+        let rec = false;
+        node.inputs.forEach(input => {
+            if(input.connection){
+                const check = this.checkOutput(node, input.connection.output);
+                if(check.includes(node)){
+                    rec = true;
+                }
+            }
+        })
+        return rec;
+    }
+
+    checkOutput(node:_Node, output:_Output<any>):_Node[] {
+        if(!output.node) return [];
+
+        let nodes = output.node.inputs.map(input => {
+            if(input.connection && input.node !== node){
+                return this.checkOutput(node, input.connection.output);
+            }else{
+                return [];
+            }
+        }).flat();
+
+        nodes = [...nodes, output.node];
+
+        return nodes;
+    }
+
 }
 
 export default _Engine;
