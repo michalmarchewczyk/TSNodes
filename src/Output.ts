@@ -30,7 +30,7 @@ class _Output<T> {
 
     setupElement() {
         this.element.className = classes.outputElement;
-        this.element.innerText = this.name;
+        this.element.innerHTML = `<span>${this.name}</span>`;
         const snap = document.createElement('div');
         snap.className = classes.outputSnap;
         const dot = document.createElement('div');

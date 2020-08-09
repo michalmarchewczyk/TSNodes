@@ -335,6 +335,15 @@ const styles = {
         paddingLeft: 8,
         textOverflow: 'ellipsis',
         whiteSpace: 'nowrap',
+        '& span': {
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+            position: 'absolute',
+            left: 8,
+            maxWidth: 'calc(100% - 18px)',
+            width: 'calc(100% - 18px)',
+        }
     },
     outputSnap: {
         display: 'block',
