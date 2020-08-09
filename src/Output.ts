@@ -1,48 +1,9 @@
-import jss from 'jss';
-import preset from 'jss-preset-default';
 import config from './config';
 import _Node from './Node';
 import _Connection from './Connection';
 
+import classes from './jssBase';
 
-jss.setup(preset());
-
-const styles = {
-    outputElement: {
-        display: 'block',
-        position: 'relative',
-        top: 0,
-        left: 0,
-        minHeight: 20,
-        outline: (config.debug) ? '1px solid red' : 'none',
-        marginTop: 5,
-        marginBottom: 5,
-        textAlign: 'right',
-        paddingRight: 10,
-        paddingLeft: 8,
-    },
-    snap: {
-        display: 'block',
-        position: 'absolute',
-        top: 2,
-        right: -8,
-        width: 16,
-        height: 16,
-        outline: (config.debug) ? '1px solid cyan' : 'none',
-    },
-    dot: {
-        display: 'block',
-        position: 'absolute',
-        top: 4,
-        left: 4,
-        width: 8,
-        height: 8,
-        background: '#eeeeee',
-        borderRadius: 10,
-    }
-}
-
-const {classes} = jss.createStyleSheet(styles).attach();
 
 type _OutputFn<T> = (inputs:any[]) => T;
 
@@ -71,9 +32,9 @@ class _Output<T> {
         this.element.className = classes.outputElement;
         this.element.innerText = this.name;
         const snap = document.createElement('div');
-        snap.className = classes.snap;
+        snap.className = classes.outputSnap;
         const dot = document.createElement('div');
-        dot.className = classes.dot;
+        dot.className = classes.outputDot;
         snap.appendChild(dot);
         this.element.appendChild(snap);
         this.snap = snap;

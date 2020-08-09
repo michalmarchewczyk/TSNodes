@@ -5,7 +5,12 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "tsc"
+    "build:ts": "tsc",
+    "build:scss": "sass src/styles:lib/styles",
+    "build": "npm-run-all build:*",
+    "watch:ts": "tsc -w",
+    "watch:scss": "npm run build:scss && sass --watch src/styles:lib/styles",
+    "watch": "npm-run-all -p watch:*"
   },
   "repository": {
     "type": "git",
@@ -18,6 +23,8 @@
   },
   "homepage": "https://github.com/michalmarchewczyk/TSNodes#readme",
   "devDependencies": {
+    "npm-run-all": "^4.1.5",
+    "sass": "^1.26.10",
     "tslint": "^6.1.2",
     "typescript": "^3.9.7"
   },

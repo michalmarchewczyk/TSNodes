@@ -1,9 +1,6 @@
 import _Graph, {_GraphClipboard} from './Graph';
 import _Node, {nodeClass} from './Node';
 
-import jss from 'jss';
-import preset from 'jss-preset-default';
-
 import config from './config';
 import _Input from './Input';
 import _Output from './Output';
@@ -11,95 +8,8 @@ import _Connection from './Connection';
 import {elementContainsNodes, nodePosAverage} from './utils';
 import _Engine from './Engine';
 
+import classes from './jssBase';
 
-jss.setup(preset());
-
-
-const styles = {
-    view: {
-        display: 'block',
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        width: '100%',
-        height: '100%',
-        overflow: 'hidden',
-    },
-    canvas: {
-        display: 'block',
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        width: config.defaultCanvasWidth,
-        height: config.defaultCanvasHeight,
-        backgroundColor: '#444444',
-        background: `
-            linear-gradient(to right, rgba(255,255,255,0.1) 1px, transparent 1px),
-            linear-gradient(to bottom, rgba(255,255,255,0.1) 1px, transparent 1px),
-            linear-gradient(to right, rgba(255,255,255,0.1) 1px, transparent 1px),
-            linear-gradient(to bottom, rgba(255,255,255,0.1) 1px, transparent 1px)
-        `,
-        backgroundSize: '20px 20px, 20px 20px, 80px 80px, 80px 80px',
-        transform: 'scale(1)',
-        transformOrigin: 'top left',
-        overflow: 'hidden',
-    },
-    background: {
-        display: 'block',
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        width: '100%',
-        height: '100%',
-        '& line': {
-            stroke: 'rgba(255,255,255,0.7)',
-            strokeWidth: 2,
-        }
-    },
-    foreground: {
-        display: 'block',
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        width: '100%',
-        height: '100%',
-        '& line': {
-            stroke: 'white',
-            strokeWidth: 2,
-        },
-        zIndex: 100,
-        pointerEvents: 'none',
-    },
-    nodeElement: {
-        display: 'block',
-        position: 'relative',
-        top: 0,
-        left: 0,
-        width: '100%',
-        height: '40px',
-        outline: (config.debug) ? '1px solid red' : 'none',
-        cursor: 'pointer',
-    },
-    graphElement: {
-        display: 'block',
-        position: 'relative',
-        top: 0,
-        left: 0,
-        width: '100%',
-        height: '40px',
-        outline: (config.debug) ? '1px solid red' : 'none',
-        '&.graphSelected': {
-            fontWeight: 'bold',
-        }
-    },
-    selectBox: {
-        display: 'block',
-        position: 'absolute',
-        border: '1px dashed rgba(255,255,255,0.8)',
-    }
-}
-
-const {classes} = jss.createStyleSheet(styles).attach();
 
 interface foregroundState {
     input:_Input<any> | null;

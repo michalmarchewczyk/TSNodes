@@ -1,158 +1,8 @@
-import jss from 'jss';
-import preset from 'jss-preset-default';
 import config from './config';
 import _Node from './Node';
 import _Connection from './Connection';
 
-
-jss.setup(preset());
-
-const styles = {
-    inputElement: {
-        display: 'block',
-        position: 'relative',
-        top: 0,
-        left: 0,
-        minHeight: 20,
-        height: 20,
-        maxHeight: 20,
-        outline: (config.debug) ? '1px solid red' : 'none',
-        marginTop: 5,
-        marginBottom: 5,
-        paddingLeft: 10,
-        paddingRight: 8,
-    },
-    snap: {
-        display: 'block',
-        position: 'absolute',
-        top: 2,
-        left: -8,
-        width: 16,
-        height: 16,
-        outline: (config.debug) ? '1px solid cyan' : 'none',
-    },
-    dot: {
-        display: 'block',
-        position: 'absolute',
-        top: 4,
-        left: 4,
-        width: 8,
-        height: 8,
-        background: '#eeeeee',
-        borderRadius: 10,
-    },
-    fieldElement: {
-        display: 'flex',
-        position: 'absolute',
-        width: 'calc(100% - 16px)',
-        height: '100%',
-        overflow: 'hidden',
-        '& span': {
-            flex: '0 1 auto',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap',
-            '&::after': {
-                content: '":\\00a0"',
-            }
-        },
-        '& input': {
-            display: 'inline-block',
-            position: 'relative',
-            flex: '1 1 20px',
-            minWidth: 20,
-            outline: 'none',
-            border: 'none',
-        }
-    },
-    fieldElementNumber: {
-        display: 'inline-block',
-        position: 'absolute',
-        width: 'calc(100% - 18px)',
-        height: '100%',
-        overflow: 'hidden',
-        '& div': {
-            display: 'flex',
-            position: 'absolute',
-            width: '100%',
-            height: '100%',
-            backgroundColor: '#555555',
-            overflow: 'hidden',
-            '& button:first-child': {
-                flex: '0 0 20px',
-                background: 'transparent',
-                border: 'none',
-                '&::before': {
-                    content: '""',
-                    display: 'block',
-                    width: 0,
-                    height: 0,
-                    borderStyle: 'solid',
-                    borderWidth: '6px 9px 6px 0',
-                    borderColor: 'transparent white transparent transparent',
-                }
-            },
-            '& span': {
-                flex: '0 1 auto',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap',
-                '&::after': {
-                    content: '":\\00a0"',
-                }
-            },
-            '& input': {
-                '-moz-appearance': 'textfield',
-                '&::-webkit-inner-spin-button, &::-webkit-outer-spin-button': {
-                    '-webkit-appearance': 'none',
-                    margin: 0,
-                },
-                flex: '1 1 20px',
-                minWidth: 20,
-                border: 'none',
-                outline: 'none',
-            },
-            '& button:last-child': {
-                flex: '0 0 20px',
-                background: 'transparent',
-                border: 'none',
-                '&::before': {
-                    content: '""',
-                    display: 'block',
-                    width: 0,
-                    height: 0,
-                    borderStyle: 'solid',
-                    borderWidth: '6px 0 6px 9px',
-                    borderColor: 'transparent transparent transparent white',
-                }
-            },
-        },
-    },
-    fieldElementBoolean: {
-        display: 'flex',
-        position: 'absolute',
-        width: 'calc(100% - 16px)',
-        height: '100%',
-        overflow: 'hidden',
-        '& span': {
-            flex: '0 1 auto',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap',
-            '&::after': {
-                content: '":\\00a0"',
-            }
-        },
-        '& input': {
-            display: 'inline-block',
-            position: 'relative',
-            flex: '0 1 20px',
-            minWidth: 20,
-        }
-    }
-}
-
-const {classes} = jss.createStyleSheet(styles).attach();
+import classes from './jssBase';
 
 
 class _Input<T> {
@@ -183,9 +33,9 @@ class _Input<T> {
         this.element.className = classes.inputElement;
         if (this.socket) {
             const snap = document.createElement('div');
-            snap.className = classes.snap;
+            snap.className = classes.inputSnap;
             const dot = document.createElement('div');
-            dot.className = classes.dot;
+            dot.className = classes.inputDot;
             snap.appendChild(dot);
             this.element.appendChild(snap);
             this.snap = snap;

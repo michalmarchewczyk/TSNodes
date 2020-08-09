@@ -4,6 +4,7 @@ import _Node from './Node';
 import _Graph from './Graph';
 import _Editor from './Editor';
 import _Engine from './Engine';
+import {setup} from './config';
 
 
 const TSNodes = {
@@ -17,6 +18,7 @@ const TSNodes = {
     InputFloat: _InputFloat,
     InputBoolean: _InputBoolean,
     InputString: _InputString,
+    setup,
 }
 
 export default TSNodes;

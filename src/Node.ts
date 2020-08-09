@@ -2,13 +2,11 @@ import _Input from './Input';
 import _Output from './Output';
 import _Connection from './Connection';
 
-import jss from 'jss';
-import preset from 'jss-preset-default';
 import _Editor from './Editor';
 
-jss.setup(preset());
 
 import config from './config';
+import classes from './jssBase';
 
 interface _NodeBox {
     pos:[number, number];
@@ -20,105 +18,6 @@ interface _NodeBox {
 type nodeClass = (editor:_Editor, name:string) => any;
 
 export {nodeClass}
-
-const styles = {
-    node: {
-        display: 'block',
-        position: 'absolute',
-        background: '#777777',
-        outline: (config.debug) ? '1px solid blue' : 'none',
-        minHeight: 40,
-        height: 'auto',
-        '&.nodeCollapsed': {
-            maxHeight: 25,
-            minHeight: 25,
-            overflow: 'hidden',
-            '& $name button': {
-                borderStyle: 'solid',
-                borderWidth: '6px 0 6px 10px',
-                borderColor: 'transparent transparent transparent white',
-                top: '-4px',
-            },
-            '& $nodeContainer': {
-                visibility: 'hidden',
-                marginTop: 5,
-                '& div': {
-                    height: 0,
-                    minHeight: 0,
-                    maxHeight: 0,
-                    marginTop: 0,
-                    marginBottom: 0,
-                }
-            }
-        },
-        '&.nodeSelected': {
-            outline: '1px solid white',
-        },
-        '&.nodeActive': {
-            outline: '2px solid white',
-        }
-    },
-    handleLeft: {
-        display: 'block',
-        position: 'absolute',
-        top: 20,
-        left: -8,
-        width: 16,
-        height: 'calc(100% - 20px)',
-        outline: (config.debug) ? '1px solid green' : 'none',
-        cursor: 'ew-resize',
-        zIndex: 20,
-    },
-    handleRight: {
-        display: 'block',
-        position: 'absolute',
-        top: 20,
-        right: -8,
-        width: 16,
-        height: 'calc(100% - 20px)',
-        outline: (config.debug) ? '1px solid green' : 'none',
-        cursor: 'ew-resize',
-        zIndex: 20,
-    },
-    name: {
-        display: 'block',
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        width: '100%',
-        height: 20,
-        background: '#555555',
-        color: 'white',
-        cursor: 'default',
-        '& button': {
-            display: 'inline-block',
-            position: 'relative',
-            width: 0,
-            height: 0,
-            outline: 'none',
-            background: 'transparent',
-            padding: '0',
-            borderStyle: 'solid',
-            borderWidth: '10px 6px 0 6px',
-            borderColor: 'white transparent transparent transparent',
-            margin: '4px',
-            top: 0,
-        }
-    },
-    nodeContainer: {
-        display: 'block',
-        position: 'relative',
-        marginTop: 30,
-        marginBottom: 8,
-        left: 0,
-        width: '100%',
-        height: 'auto',
-        outline: (config.debug) ? '2px solid orange' : 'none',
-        zIndex: 30,
-    }
-}
-
-const {classes} = jss.createStyleSheet(styles).attach();
 
 
 abstract class _Node {
@@ -221,25 +120,25 @@ abstract class _Node {
 
     activate() {
         if(this.editor.view.activeNode){
-            this.editor.view.activeNode.element.classList.remove('nodeActive');
+            this.editor.view.activeNode.element.classList.remove(classes.nodeActive);
             this.editor.view.activeNode.active = false;
             this.editor.view.activeNode = null;
         }
-        this.element.classList.add('nodeActive');
+        this.element.classList.add(classes.nodeActive);
         this.active = true;
         this.editor.view.activeNode = this;
     }
 
     select() {
         if(!this.editor.view.selectedNodes.includes(this)) this.editor.view.selectedNodes.push(this);
-        this.element.classList.add('nodeSelected');
+        this.element.classList.add(classes.nodeSelected);
         this.selected = true;
     }
 
     selectCheck() {
         if(!this.editor.view.keyboardState.shift){
             this.editor.view.selectedNodes.forEach(node => {
-                node.element.classList.remove('nodeSelected');
+                node.element.classList.remove(classes.nodeSelected);
                 node.selected = false;
             });
             this.editor.view.selectedNodes = [];
