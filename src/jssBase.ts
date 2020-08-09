@@ -28,13 +28,6 @@ const styles = {
         width: () => config.defaultCanvasWidth,
         height: () => config.defaultCanvasHeight,
         backgroundColor: '#444444',
-        background: `
-            linear-gradient(to right, rgba(255,255,255,0.1) 1px, transparent 1px),
-            linear-gradient(to bottom, rgba(255,255,255,0.1) 1px, transparent 1px),
-            linear-gradient(to right, rgba(255,255,255,0.1) 1px, transparent 1px),
-            linear-gradient(to bottom, rgba(255,255,255,0.1) 1px, transparent 1px)
-        `,
-        backgroundSize: '20px 20px, 20px 20px, 80px 80px, 80px 80px',
         transform: 'scale(1)',
         transformOrigin: 'top left',
         overflow: 'hidden',
@@ -68,24 +61,15 @@ const styles = {
     nodeElement: {
         display: 'block',
         position: 'relative',
-        top: 0,
-        left: 0,
-        width: '100%',
-        height: '40px',
         outline: (() => config.debug ? '1px solid red' : 'none'),
-        cursor: 'pointer',
     },
     graphElement: {
         display: 'block',
         position: 'relative',
-        top: 0,
-        left: 0,
-        width: '100%',
-        height: '40px',
         outline: (() => config.debug ? '1px solid red' : 'none'),
-        '&.graphSelected': {
-            fontWeight: 'bold',
-        }
+    },
+    graphSelected: {
+        fontWeight: 'bold',
     },
     selectBox: {
         display: 'block',
@@ -157,9 +141,10 @@ const styles = {
         left: 0,
         width: '100%',
         height: 20,
-        background: '#555555',
-        color: 'white',
         cursor: 'default',
+        overflow: 'hidden',
+        textOverflow: 'ellipsis',
+        whiteSpace: 'nowrap',
         '& button': {
             display: 'inline-block',
             position: 'relative',
@@ -199,6 +184,14 @@ const styles = {
         marginBottom: 5,
         paddingLeft: 10,
         paddingRight: 8,
+        '& > span': {
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+            position: 'absolute',
+            maxWidth: 'calc(100% - 20px)',
+            width: 'calc(100% - 20px)',
+        }
     },
     inputSnap: {
         display: 'block',
@@ -340,6 +333,8 @@ const styles = {
         textAlign: 'right',
         paddingRight: 10,
         paddingLeft: 8,
+        textOverflow: 'ellipsis',
+        whiteSpace: 'nowrap',
     },
     outputSnap: {
         display: 'block',
