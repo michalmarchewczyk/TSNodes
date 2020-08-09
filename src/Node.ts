@@ -74,10 +74,10 @@ abstract class _Node {
     collapse(collapse?:boolean) {
         if(collapse === true || !this.nodeBox.collapsed){
             this.nodeBox.collapsed = true;
-            this.element.classList.add('nodeCollapsed');
+            this.element.classList.add(classes.nodeCollapsed);
         }else{
             this.nodeBox.collapsed = false;
-            this.element.classList.remove('nodeCollapsed');
+            this.element.classList.remove(classes.nodeCollapsed);
         }
         this.editor.view.offsetX = (this.editor.view.scrollX - this.editor.view.container.getBoundingClientRect().left)/this.editor.view.zoom;
         this.editor.view.offsetY = (this.editor.view.scrollY - this.editor.view.container.getBoundingClientRect().top)/this.editor.view.zoom;

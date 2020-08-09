@@ -74,13 +74,13 @@ class _EditorView {
         this.graph = graph;
         this.renderGraph();
         if (this.activeNode) {
-            this.activeNode.element.classList.remove('nodeActive');
+            this.activeNode.element.classList.remove(classes.nodeActive);
             this.activeNode.active = false;
             this.activeNode = null;
         }
         if (this.selectedNodes.length !== 0) {
             this.selectedNodes.forEach(node => {
-                node.element.classList.remove('nodeSelected');
+                node.element.classList.remove(classes.nodeSelected);
                 node.selected = false;
             });
             this.selectedNodes = [];
@@ -243,13 +243,13 @@ class _EditorView {
         const deltaY = (this.scrollY + this.container.getBoundingClientRect().height/2) / this.zoom - this.clipboard.center[1] - 20;
 
         if (this.activeNode) {
-            this.activeNode.element.classList.remove('nodeActive');
+            this.activeNode.element.classList.remove(classes.nodeActive);
             this.activeNode.active = false;
             this.activeNode = null;
         }
         if (this.selectedNodes.length !== 0) {
             this.selectedNodes.forEach(node => {
-                node.element.classList.remove('nodeSelected');
+                node.element.classList.remove(classes.nodeSelected);
                 node.selected = false;
             });
             this.selectedNodes = [];
@@ -431,13 +431,13 @@ class _EditorView {
 
             if (!this.keyboardState.shift) {
                 if (this.activeNode) {
-                    this.activeNode.element.classList.remove('nodeActive');
+                    this.activeNode.element.classList.remove(classes.nodeActive);
                     this.activeNode.active = false;
                     this.activeNode = null;
                 }
                 if (this.selectedNodes.length !== 0) {
                     this.selectedNodes.forEach(node => {
-                        node.element.classList.remove('nodeSelected');
+                        node.element.classList.remove(classes.nodeSelected);
                         node.selected = false;
                     });
                     this.selectedNodes = [];
@@ -514,9 +514,9 @@ class _EditorGraphs {
         this.container.appendChild(graphElement);
         this.editor.selectGraph(graph);
         Array.from(this.container.children).forEach(child => {
-            child.classList.remove('graphSelected');
+            child.classList.remove(classes.graphSelected);
         })
-        graphElement.classList.add('graphSelected');
+        graphElement.classList.add(classes.graphSelected);
     }
 
     renderGraphElement(graph:_Graph):HTMLElement {
@@ -526,9 +526,9 @@ class _EditorGraphs {
         graphElement.onclick = () => {
             this.editor.selectGraph(graph);
             Array.from(this.container.children).forEach(child => {
-                child.classList.remove('graphSelected');
+                child.classList.remove(classes.graphSelected);
             })
-            graphElement.classList.add('graphSelected');
+            graphElement.classList.add(classes.graphSelected);
         }
         return graphElement;
     }
