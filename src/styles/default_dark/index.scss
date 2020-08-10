@@ -179,6 +179,12 @@
       &:hover {
         background: lighten(#505050, 4);
       }
+      &:first-child::before {
+        border-color: transparent #aaaaaa transparent transparent;
+      }
+      &:last-child::before {
+        border-color: transparent transparent transparent #aaaaaa;
+      }
     }
     span {
       padding-left: 4px;
