@@ -165,6 +165,8 @@ abstract class _Node {
             e.preventDefault();
             e.stopPropagation();
 
+            (<HTMLElement>document.activeElement).blur();
+
             if (e.button !== 0) return;
 
             let clientX:number;

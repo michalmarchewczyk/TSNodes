@@ -320,6 +320,9 @@ class _EditorView {
             let clientX:number;
             let clientY:number;
             e.preventDefault();
+
+            (<HTMLElement>document.activeElement).blur();
+
             if (e.button !== 1 || this.move) return;
 
             this.move = true;
