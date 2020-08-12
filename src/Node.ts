@@ -127,6 +127,7 @@ abstract class _Node {
         this.element.classList.add(classes.nodeActive);
         this.active = true;
         this.editor.view.activeNode = this;
+        this.editor.info.update();
     }
 
     select() {

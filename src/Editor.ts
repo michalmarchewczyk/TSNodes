@@ -77,6 +77,7 @@ class _EditorView {
             this.activeNode.element.classList.remove(classes.nodeActive);
             this.activeNode.active = false;
             this.activeNode = null;
+            this.editor.info.update();
         }
         if (this.selectedNodes.length !== 0) {
             this.selectedNodes.forEach(node => {
@@ -150,6 +151,7 @@ class _EditorView {
         }
         if (this.activeNode === node) {
             this.activeNode = null;
+            this.editor.info.update();
         }
         this.canvas.removeChild(node.render());
         index = this.selectedNodes.indexOf(node) ?? -1;
@@ -246,6 +248,7 @@ class _EditorView {
             this.activeNode.element.classList.remove(classes.nodeActive);
             this.activeNode.active = false;
             this.activeNode = null;
+            this.editor.info.update();
         }
         if (this.selectedNodes.length !== 0) {
             this.selectedNodes.forEach(node => {
@@ -437,6 +440,7 @@ class _EditorView {
                     this.activeNode.element.classList.remove(classes.nodeActive);
                     this.activeNode.active = false;
                     this.activeNode = null;
+                    this.editor.info.update();
                 }
                 if (this.selectedNodes.length !== 0) {
                     this.selectedNodes.forEach(node => {
@@ -479,15 +483,15 @@ class _EditorView {
         })
     }
 
-    private renderGraph() {
+    renderGraph() {
         this.canvas.innerHTML = '';
         this.canvas.appendChild(this.background);
-        if (!this.graph) throw new Error('There is no graph selected');
+        this.background.innerHTML = '';
+        if (!this.graph) return;
         this.graph.nodes.forEach((node) => {
             const nodeElement = node.render();
             this.canvas.appendChild(nodeElement);
         });
-        this.background.innerHTML = '';
         this.graph.connections.forEach(connection => {
             const line = connection.render();
             this.offsetX = (this.scrollX - this.container.getBoundingClientRect().left) / this.zoom;
@@ -523,9 +527,10 @@ class _EditorGraphs {
     }
 
     renderGraphElement(graph:_Graph):HTMLElement {
-        const graphElement = document.createElement('div');
-        graphElement.className = classes.graphElement;
-        graphElement.innerText = graph.name;
+        // const graphElement = document.createElement('div');
+        // graphElement.className = classes.graphElement;
+        // graphElement.innerText = graph.name;
+        const graphElement = graph.button;
         graphElement.onclick = () => {
             this.editor.selectGraph(graph);
             Array.from(this.container.children).forEach(child => {
@@ -597,11 +602,44 @@ class _EditorInfo {
     }
 
     setupElement() {
+        this.update();
+    }
 
+    getGraphInfo(graph:_Graph):HTMLElement {
+        const element = document.createElement('div');
+        element.innerHTML = `<label><span>Graph name: </span><input value='${graph.name}'></label><button>Delete</button>`;
+        (<HTMLInputElement>element.children[0].children[1]).oninput = (e) => {
+            graph.name = (<HTMLInputElement>element.children[0].children[1]).value;
+            graph.button.innerText = graph.name;
+        }
+        (<HTMLElement>element.children[1]).onclick = (e) => {
+            this.editor.deleteGraph(graph);
+        }
+        return element;
+    }
+
+    getNodeInfo(node:_Node):HTMLElement {
+        const element = document.createElement('div');
+        element.innerHTML = `<label><span>Node name: </span><input value='${node.name}'></label><button>Delete</button>`;
+        (<HTMLInputElement>element.children[0].children[1]).oninput = (e) => {
+            node.setName((<HTMLInputElement>element.children[0].children[1]).value);
+        }
+        (<HTMLElement>element.children[1]).onclick = (e) => {
+            this.editor.view.deleteNode(node);
+        }
+        return element;
     }
 
     update() {
-
+        this.container.innerHTML = '';
+        if(this.editor.view.activeNode){
+            this.container.appendChild(this.getNodeInfo(this.editor.view.activeNode))
+            return;
+        }
+        if(this.editor.view.graph){
+            this.container.appendChild(this.getGraphInfo(this.editor.view.graph));
+            return;
+        }
     }
 
     render():HTMLElement {
@@ -640,6 +678,16 @@ class _Editor {
 
     selectGraph(graph:_Graph) {
         this.view.selectGraph(graph);
+        this.info.update();
+    }
+
+    deleteGraph(graph:_Graph) {
+        if(!confirm(`Are you sure you want to delete graph "${graph.name}?"`)) return;
+        if(graph === this.view.graph){
+            this.view.graph = undefined;
+            this.view.renderGraph();
+        }
+        this.graphs.container.removeChild(graph.button);
     }
 
     createNode(node:_Node):void {

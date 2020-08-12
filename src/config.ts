@@ -14,9 +14,9 @@ export interface Config {
 const defaultConfig = {
     defaultCanvasWidth: 200000,
     defaultCanvasHeight: 200000,
-    zoomMin: 0.6,
+    zoomMin: 0.4,
     zoomMax: 2,
-    defaultNodeWidth: 120,
+    defaultNodeWidth: 160,
     minNodeWidth: 100,
     maxNodeWidth: 240,
     debug: true,

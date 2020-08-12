@@ -1,11 +1,16 @@
 import _Node from './Node';
 import _Connection from './Connection';
+import classes from './jssBase';
 
 class _Graph {
     public nodes:_Node[] = [];
     public connections:_Connection[] = [];
+    public button:HTMLElement;
 
     constructor(public name:string) {
+        this.button = document.createElement('div');
+        this.button.className = classes.graphElement;
+        this.button.innerText = this.name;
     }
 
     createNode(node:_Node):void {
