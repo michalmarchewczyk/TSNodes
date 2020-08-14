@@ -2,8 +2,36 @@
 
 An open source TypeScript/JavaScript library for creating visual programming interfaces.
 
+
+![npm](https://img.shields.io/npm/v/tsnodes)
+![GitHub](https://img.shields.io/github/license/michalmarchewczyk/TSNodes)
+![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/michalmarchewczyk/tsnodes)
+![GitHub last commit](https://img.shields.io/github/last-commit/michalmarchewczyk/tsnodes)
+
 ## Installation
     
+  
+### npm
+1. Install via npm
+    ```bash
+    npm install tsnodes
+    ```
+
+1. Import library to your project
+    ```javascript
+    import TSNodes from 'tsnodes';
+    ```
+   
+1. Add styling  
+    Using javascript: 
+    ```Javascript
+    import 'tsnodes/lib/styles/default_dark/index.css';
+    ```
+   or HTML:
+   ```html
+   <link rel='stylesheet' href='node_modules/tsnodes/lib/styles/default_dark/index.css'>
+   ```
+   
 ### Git
 1. Clone this repository
     ```bash
@@ -23,27 +51,6 @@ An open source TypeScript/JavaScript library for creating visual programming int
 1. Import library to your project
     ```javascript
     import TSNodes from 'TSNodes/lib';
-    ```
-   
-1. Add styling  
-    Using javascript: 
-    ```Javascript
-    import 'TSNodes/lib/styles/default_dark/index.css';
-    ```
-   or HTML:
-   ```html
-   <link rel='stylesheet' href='TSNodes/lib/styles/default_dark/index.css'>
-   ```
-   
-### npm
-1. Install via npm
-    ```bash
-    npm install tsnodes
-    ```
-
-1. Import library to your project
-    ```javascript
-    import TSNodes from 'TSNodes';
     ```
    
 1. Add styling  
