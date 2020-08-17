@@ -5,7 +5,7 @@ import _Connection from './Connection';
 import classes from './jssBase';
 
 
-type _OutputFn<T> = (inputs:any[]) => T;
+export type _OutputFn<T> = (inputs:any[]) => T;
 
 interface outputValue<T> {
     index:number,

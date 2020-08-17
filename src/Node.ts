@@ -1,5 +1,5 @@
-import _Input from './Input';
-import _Output from './Output';
+import _Input, {_InputFloat, _InputNumber} from './Input';
+import _Output, {_OutputFn} from './Output';
 import _Connection from './Connection';
 
 import _Editor from './Editor';
@@ -38,6 +38,22 @@ abstract class _Node {
     protected constructor(public editor:_Editor, public name:string) {
         this.element = document.createElement('div');
         this.setupElement();
+    }
+
+    input<T>(name:string = 'input', defaultValue:T, elementField:boolean = true, socket:boolean = true) {
+        this.addInput(new _Input<T>(name, defaultValue, elementField, socket));
+    }
+
+    inputNumber(name:string = 'input', defaultValue:number = 0, min:number = 0, max:number = 100, elementField?:boolean, socket?:boolean) {
+        this.addInput(new _InputNumber(name, defaultValue, min, max, elementField, socket))
+    }
+
+    inputFloat(name:string = 'input', defaultValue:number = 0, min:number = 0, max:number = 1, step:number = 0.1, elementField?:boolean, socket?:boolean) {
+        this.addInput(new _InputFloat(name, defaultValue, min, max, step, elementField, socket))
+    }
+
+    output<T>(name:string = 'output', fn:_OutputFn<any> = (inputs) => inputs, visible:boolean = true) {
+        this.addOutput(new _Output<T>(name, fn, visible));
     }
 
     setupElement():void {
