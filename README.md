@@ -98,6 +98,34 @@ An open source TypeScript/JavaScript library for creating visual programming int
     ```javascript
     editor.addNode(node1);
     ```
+   
+1. Adding inputs to node type  
+    To add inputs to node type expand node constructor by adding `this.input(args)` calls or `this.addInput(new TSNodes.Input(args))` calls
+    ```javascript
+    class node1 extends TSNodes.Node {
+      constructor() {
+        super(editor, 'Node 1');
+        this.input('input 1', 'default value');
+        this.input('input 2', '');
+        this.addInput(new TSNodes.Input('input 3', '', false));
+      }   
+    }
+    ```
+   
+1. Adding outputs to node type
+    To add outputs to node type expand node constructor by adding `this.output(args)` calls or `this.addOutput(new TSNodes.Output())` calls.
+    ```javascript
+    class node1 extends TSNodes.Node {
+      constructor() {
+        super(editor, 'Node 1');
+        this.input('input 1', 'default value');
+        this.input('input 2', '', );
+        this.addInput(new TSNodes.Input('input 3', '', false));
+        this.output('output 1', function1);
+        this.addOutput(new TSNodes.Output('output2', function2, false));
+      }   
+    }
+    ```
 
 ## Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
