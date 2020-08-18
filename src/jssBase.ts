@@ -76,6 +76,12 @@ const styles = {
         position: 'absolute',
         border: '1px dashed rgba(255,255,255,0.8)',
     },
+    nodeInfo: {
+        outline: (() => config.debug ? '1px solid red' : 'none'),
+    },
+    graphInfo: {
+        outline: (() => config.debug ? '1px solid red' : 'none'),
+    },
     node: {
         display: 'block',
         position: 'absolute',

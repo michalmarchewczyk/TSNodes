@@ -615,6 +615,7 @@ class _EditorInfo {
         (<HTMLElement>element.children[1]).onclick = (e) => {
             this.editor.deleteGraph(graph);
         }
+        element.className = classes.graphInfo;
         return element;
     }
 
@@ -627,6 +628,7 @@ class _EditorInfo {
         (<HTMLElement>element.children[1]).onclick = (e) => {
             this.editor.view.deleteNode(node);
         }
+        element.className = classes.nodeInfo;
         return element;
     }
 

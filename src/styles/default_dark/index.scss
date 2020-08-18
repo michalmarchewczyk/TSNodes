@@ -51,6 +51,102 @@
   background: rgba(255,255,255,0.04);
 }
 
+.TSNodes_graphInfo {
+  background: #888888;
+  label {
+    display: block;
+    padding-top: 6px;
+    span {
+      margin-left: 6px;
+      color: white;
+    }
+    input {
+      background: #505050;
+      color: white;
+      font-size: 16px;
+      border-radius: 3px;
+      text-indent: 2px;
+      outline: none;
+      border: none;
+      margin-left: 6px;
+      width: calc(100% - 16px);
+      height: 24px;
+      margin-top: 4px;
+      margin-bottom: 4px;
+      &:focus {
+        background: darken(#505050, 8);
+      }
+    }
+  }
+  button {
+    background: lighten(#444444, 10);
+    border-radius: 4px;
+    color: white;
+    margin: 5px;
+    padding: 5px;
+    width: calc(100% - 10px);
+    height: 20px;
+    box-shadow: 1px 1px 3px rgba(0,0,0,0.4);
+    cursor: pointer;
+    outline: none;
+    border: none;
+    font-size: 16px;
+    padding-bottom: 22px;
+    margin-bottom: 10px;
+    &:hover {
+      background: lighten(#444444, 20);
+    }
+  }
+}
+
+.TSNodes_nodeInfo {
+  background: #888888;
+  label {
+    display: block;
+    padding-top: 6px;
+    span {
+      margin-left: 6px;
+      color: white;
+    }
+    input {
+      background: #505050;
+      color: white;
+      font-size: 16px;
+      border-radius: 3px;
+      text-indent: 2px;
+      outline: none;
+      border: none;
+      margin-left: 6px;
+      width: calc(100% - 16px);
+      height: 24px;
+      margin-top: 4px;
+      margin-bottom: 4px;
+      &:focus {
+        background: darken(#505050, 8);
+      }
+    }
+  }
+  button {
+    background: lighten(#444444, 10);
+    border-radius: 4px;
+    color: white;
+    margin: 5px;
+    padding: 5px;
+    width: calc(100% - 10px);
+    height: 20px;
+    box-shadow: 1px 1px 3px rgba(0,0,0,0.4);
+    cursor: pointer;
+    outline: none;
+    border: none;
+    font-size: 16px;
+    padding-bottom: 22px;
+    margin-bottom: 10px;
+    &:hover {
+      background: lighten(#444444, 20);
+    }
+  }
+}
+
 .TSNodes_node {
   border-radius: 4px;
   box-shadow: 1px 1px 5px rgba(0,0,0,0.2);

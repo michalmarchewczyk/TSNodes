@@ -62,6 +62,102 @@
   background: rgba(0,0,0,0.04);
 }
 
+.TSNodes_graphInfo {
+  background: #eeeeee;
+  label {
+    display: block;
+    padding-top: 6px;
+    span {
+      margin-left: 6px;
+      color: black;
+    }
+    input {
+      background: #d6d6d6;
+      color: black;
+      font-size: 14px;
+      border-radius: 3px;
+      text-indent: 2px;
+      outline: none;
+      border: none;
+      margin-left: 6px;
+      width: calc(100% - 16px);
+      height: 24px;
+      margin-top: 4px;
+      margin-bottom: 4px;
+      &:focus {
+        background: darken(#d6d6d6, 8);
+      }
+    }
+  }
+  button {
+    background: #e8e8e8;
+    border-radius: 4px;
+    color: rgba(0,0,0,0.7);
+    margin: 5px;
+    padding: 5px;
+    width: calc(100% - 10px);
+    height: 20px;
+    box-shadow: 1px 1px 3px rgba(0,0,0,0.4);
+    cursor: pointer;
+    outline: none;
+    border: none;
+    font-size: 16px;
+    padding-bottom: 22px;
+    margin-bottom: 10px;
+    &:hover {
+      background: darken(#e8e8e8, 10);
+    }
+  }
+}
+
+.TSNodes_nodeInfo {
+  background: #eeeeee;
+  label {
+    display: block;
+    padding-top: 6px;
+    span {
+      margin-left: 6px;
+      color: black;
+    }
+    input {
+      background: #d6d6d6;
+      color: black;
+      font-size: 14px;
+      border-radius: 3px;
+      text-indent: 2px;
+      outline: none;
+      border: none;
+      margin-left: 6px;
+      width: calc(100% - 16px);
+      height: 24px;
+      margin-top: 4px;
+      margin-bottom: 4px;
+      &:focus {
+        background: darken(#d6d6d6, 8);
+      }
+    }
+  }
+  button {
+    background: #e8e8e8;
+    border-radius: 4px;
+    color: rgba(0,0,0,0.7);
+    margin: 5px;
+    padding: 5px;
+    width: calc(100% - 10px);
+    height: 20px;
+    box-shadow: 1px 1px 3px rgba(0,0,0,0.4);
+    cursor: pointer;
+    outline: none;
+    border: none;
+    font-size: 16px;
+    padding-bottom: 22px;
+    margin-bottom: 10px;
+    &:hover {
+      background: darken(#e8e8e8, 10);
+    }
+  }
+}
+
 .TSNodes_node {
   border-radius: 4px;
   box-shadow: 1px 1px 5px rgba(0,0,0,0.2);
