@@ -225,6 +225,8 @@ abstract class _Node {
             e.stopPropagation();
             e.preventDefault();
 
+            (<HTMLElement>document.activeElement).blur();
+
             this.editor.view.offsetX = (this.editor.view.scrollX - this.editor.view.container.getBoundingClientRect().left)/this.editor.view.zoom;
             this.editor.view.offsetY = (this.editor.view.scrollY - this.editor.view.container.getBoundingClientRect().top)/this.editor.view.zoom;
 
@@ -258,6 +260,8 @@ abstract class _Node {
         rightHandle.onmousedown = (e) => {
             e.stopPropagation();
             e.preventDefault();
+
+            (<HTMLElement>document.activeElement).blur();
 
             this.editor.view.offsetX = (this.editor.view.scrollX - this.editor.view.container.getBoundingClientRect().left)/this.editor.view.zoom;
             this.editor.view.offsetY = (this.editor.view.scrollY - this.editor.view.container.getBoundingClientRect().top)/this.editor.view.zoom;
