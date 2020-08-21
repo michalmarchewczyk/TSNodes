@@ -76,6 +76,16 @@ const styles = {
         position: 'absolute',
         border: '1px dashed rgba(255,255,255,0.8)',
     },
+    contextMenu: {
+        outline: (() => config.debug ? '1px solid red' : 'none'),
+        display: 'block',
+        position: 'fixed',
+        width: 120,
+        minHeight: 20,
+        '& button': {
+            width: '100%',
+        }
+    },
     nodeInfo: {
         outline: (() => config.debug ? '1px solid red' : 'none'),
     },

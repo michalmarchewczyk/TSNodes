@@ -310,6 +310,7 @@ class _EditorView {
             this.setupKeyboard();
         });
         this.setupSelect();
+        this.setupContextMenu();
     }
 
     private setupMove() {
@@ -481,6 +482,80 @@ class _EditorView {
             }
             this.canvas.onmouseleave = this.canvas.onmouseup;
         })
+    }
+
+    private setupContextMenu() {
+        this.canvas.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+            const contextMenuElement = document.createElement('div');
+            this.container.appendChild(contextMenuElement);
+            contextMenuElement.className = classes.contextMenu;
+            contextMenuElement.style.left = e.clientX+'px';
+            contextMenuElement.style.top = e.clientY+'px';
+            contextMenuElement.tabIndex = -1;
+            contextMenuElement.focus();
+            contextMenuElement.oncontextmenu = (e) => {
+                e.preventDefault();
+            }
+            contextMenuElement.onblur = (e) => {
+                if(!contextMenuElement.contains(<Node>e.relatedTarget)) {
+                    this.container.removeChild(contextMenuElement);
+                }
+            }
+            contextMenuElement.innerHTML = `
+                <button>Paste</button>
+                <button>Add Node</button>
+                <button>Select all</button>
+            `;
+            if(this.selectedNodes.length > 0) {
+                contextMenuElement.innerHTML += `
+                    <button>Copy</button>
+                    <button>Cut</button>
+                    <button>Duplicate</button>
+                    <button>Delete</button>
+                `;
+                (<HTMLButtonElement>contextMenuElement.children[3]).onclick = (e) => {
+                    e.stopPropagation();
+                    this.copyNodes(this.selectedNodes);
+                    this.container.removeChild(contextMenuElement);
+                }
+                (<HTMLButtonElement>contextMenuElement.children[4]).onclick = (e) => {
+                    e.stopPropagation();
+                    this.cutNodes(this.selectedNodes);
+                    this.container.removeChild(contextMenuElement);
+                }
+                (<HTMLButtonElement>contextMenuElement.children[5]).onclick = (e) => {
+                    e.stopPropagation();
+                    this.duplicateNodes(this.selectedNodes);
+                    this.container.removeChild(contextMenuElement);
+                }
+                (<HTMLButtonElement>contextMenuElement.children[6]).onclick = (e) => {
+                    e.stopPropagation();
+                    this.deleteNodes(this.selectedNodes);
+                    this.container.removeChild(contextMenuElement);
+                }
+            }
+            (<HTMLButtonElement>contextMenuElement.children[0]).onclick = (e) => {
+                e.stopPropagation();
+                if(this.clipboard) {
+                    this.pasteNodes(this.clipboard.nodes);
+                }
+                this.container.removeChild(contextMenuElement);
+            }
+            (<HTMLButtonElement>contextMenuElement.children[1]).onclick = (e) => {
+                e.stopPropagation();
+
+                this.container.removeChild(contextMenuElement);
+            }
+            (<HTMLButtonElement>contextMenuElement.children[2]).onclick = (e) => {
+                e.stopPropagation();
+                if(this.graph) {
+                    this.graph.nodes.forEach(node => node.select());
+                }
+                this.container.removeChild(contextMenuElement);
+            }
+
+        });
     }
 
     renderGraph() {
