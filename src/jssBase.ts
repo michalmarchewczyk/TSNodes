@@ -84,7 +84,8 @@ const styles = {
         minHeight: 20,
         '& button': {
             width: '100%',
-        }
+        },
+        zIndex: 1000,
     },
     nodeInfo: {
         outline: (() => config.debug ? '1px solid red' : 'none'),
