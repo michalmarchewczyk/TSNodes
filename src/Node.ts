@@ -1,4 +1,4 @@
-import _Input, {_InputFloat, _InputNumber} from './Input';
+import _Input, {_InputBoolean, _InputFloat, _InputNumber} from './Input';
 import _Output, {_OutputFn} from './Output';
 import _Connection from './Connection';
 
@@ -50,6 +50,10 @@ abstract class _Node {
 
     inputFloat(name:string = 'input', defaultValue:number = 0, min:number = 0, max:number = 1, step:number = 0.1, elementField?:boolean, socket?:boolean) {
         this.addInput(new _InputFloat(name, defaultValue, min, max, step, elementField, socket))
+    }
+
+    inputBoolean(name:string = 'input', defaultValue:boolean = false, elementField: boolean = true, socket:boolean = true){
+        this.addInput(new _InputBoolean(name, defaultValue, elementField, socket));
     }
 
     output<T>(name:string = 'output', fn:_OutputFn<any> = (inputs) => inputs, visible:boolean = true) {
