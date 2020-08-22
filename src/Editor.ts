@@ -544,8 +544,18 @@ class _EditorView {
             }
             (<HTMLButtonElement>contextMenuElement.children[1]).onclick = (e) => {
                 e.stopPropagation();
-
-                this.container.removeChild(contextMenuElement);
+                contextMenuElement.innerHTML = '';
+                this.editor.nodes.getNodes().forEach(node => {
+                    const element = this.editor.nodes.renderNodeElement(node);
+                    element.className = '';
+                    let button = document.createElement('button');
+                    button.onclick = (e) => {
+                        this.container.removeChild(contextMenuElement);
+                    }
+                    contextMenuElement.appendChild(button);
+                    button.appendChild(element);
+                })
+                // this.container.removeChild(contextMenuElement);
             }
             (<HTMLButtonElement>contextMenuElement.children[2]).onclick = (e) => {
                 e.stopPropagation();
@@ -659,6 +669,10 @@ class _EditorNodes {
         }
 
         return nodeElement;
+    }
+
+    getNodes():nodeClass[] {
+        return this.nodes;
     }
 
     render():HTMLElement {
