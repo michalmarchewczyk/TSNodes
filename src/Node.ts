@@ -1,8 +1,11 @@
-import _Input, {_InputBoolean, _InputFloat, _InputNumber} from './Input';
-import _Output, {_OutputFn} from './Output';
-import _Connection from './Connection';
+import Input from './Input';
+import InputNumber from './InputNumber';
+import InputFloat from './InputFloat';
+import InputBoolean from './InputBoolean';
+import Output, {OutputFn} from './Output';
+import Connection from './Connection';
 
-import _Editor from './Editor';
+import Editor from './Editor';
 
 
 import config from './config';
@@ -15,15 +18,15 @@ interface _NodeBox {
     zIndex:number;
 }
 
-type nodeClass = (editor:_Editor, name:string) => any;
+type nodeClass = (editor:Editor, name:string) => any;
 
 export {nodeClass}
 
 
-abstract class _Node {
-    public inputs:_Input<any>[] = [];
-    public outputs:_Output<any>[] = [];
-    public connections:_Connection[] = [];
+abstract class Node {
+    public inputs:Input<any>[] = [];
+    public outputs:Output<any>[] = [];
+    public connections:Connection[] = [];
     public nodeBox:_NodeBox = {
         pos: [0, 0],
         width: config.defaultNodeWidth,
@@ -35,41 +38,33 @@ abstract class _Node {
     public selected:boolean = false;
     public active:boolean = false;
 
-    protected constructor(public editor:_Editor, public name:string) {
+    protected constructor(public editor:Editor, public name:string) {
         this.element = document.createElement('div');
         this.setupElement();
     }
 
     input<T>(name:string = 'input', defaultValue:T, elementField:boolean = true, socket:boolean = true) {
-        this.addInput(new _Input<T>(name, defaultValue, elementField, socket));
+        this.addInput(new Input<T>(name, defaultValue, elementField, socket));
     }
 
     inputNumber(name:string = 'input', defaultValue:number = 0, min:number = 0, max:number = 100, elementField?:boolean, socket?:boolean) {
-        this.addInput(new _InputNumber(name, defaultValue, min, max, elementField, socket))
+        this.addInput(new InputNumber(name, defaultValue, min, max, elementField, socket))
     }
 
     inputFloat(name:string = 'input', defaultValue:number = 0, min:number = 0, max:number = 1, step:number = 0.1, elementField?:boolean, socket?:boolean) {
-        this.addInput(new _InputFloat(name, defaultValue, min, max, step, elementField, socket))
+        this.addInput(new InputFloat(name, defaultValue, min, max, step, elementField, socket))
     }
 
-    inputBoolean(name:string = 'input', defaultValue:boolean = false, elementField: boolean = true, socket:boolean = true){
-        this.addInput(new _InputBoolean(name, defaultValue, elementField, socket));
+    inputBoolean(name:string = 'input', defaultValue:boolean = false, elementField:boolean = true, socket:boolean = true) {
+        this.addInput(new InputBoolean(name, defaultValue, elementField, socket));
     }
 
-    output<T>(name:string = 'output', fn:_OutputFn<any> = (inputs) => inputs, visible:boolean = true) {
-        this.addOutput(new _Output<T>(name, fn, visible));
+    output<T>(name:string = 'output', fn:OutputFn<any> = (inputs) => inputs, visible:boolean = true) {
+        this.addOutput(new Output<T>(name, fn, visible));
     }
 
     setupElement():void {
         this.element.className = classes.node;
-
-        const leftHandle = document.createElement('div');
-        leftHandle.className = classes.handleLeft;
-        this.element.appendChild(leftHandle);
-
-        const rightHandle = document.createElement('div');
-        rightHandle.className = classes.handleRight;
-        this.element.appendChild(rightHandle);
 
         this.setupNodeControls();
 
@@ -92,38 +87,38 @@ abstract class _Node {
     }
 
     collapse(collapse?:boolean) {
-        if(collapse === true || !this.nodeBox.collapsed){
+        if (collapse === true || !this.nodeBox.collapsed) {
             this.nodeBox.collapsed = true;
             this.element.classList.add(classes.nodeCollapsed);
-        }else{
+        } else {
             this.nodeBox.collapsed = false;
             this.element.classList.remove(classes.nodeCollapsed);
         }
-        this.editor.view.offsetX = (this.editor.view.scrollX - this.editor.view.container.getBoundingClientRect().left)/this.editor.view.zoom;
-        this.editor.view.offsetY = (this.editor.view.scrollY - this.editor.view.container.getBoundingClientRect().top)/this.editor.view.zoom;
+        this.editor.view.offsetX = (this.editor.view.scrollX - this.editor.view.container.getBoundingClientRect().left) / this.editor.view.zoom;
+        this.editor.view.offsetY = (this.editor.view.scrollY - this.editor.view.container.getBoundingClientRect().top) / this.editor.view.zoom;
         this.updateConnections();
     }
 
-    addInput(input:_Input<any>) {
+    addInput(input:Input<any>) {
         this.inputs.push(input);
         input.node = this;
         this.element.children[3].appendChild(input.render());
     }
 
-    addOutput(output:_Output<any>) {
+    addOutput(output:Output<any>) {
         this.outputs.push(output);
         output.node = this;
         this.element.children[3].appendChild(output.render());
     }
 
-    addConnection(connection:_Connection) {
+    addConnection(connection:Connection) {
         this.connections.push(connection);
     }
 
-    deleteConnection(connection:_Connection) {
-        if(this.connections.includes(connection)){
+    deleteConnection(connection:Connection) {
+        if (this.connections.includes(connection)) {
             const index = this.connections.indexOf(connection);
-            if(index > -1) {
+            if (index > -1) {
                 this.connections.splice(index, 1);
             }
         }
@@ -139,30 +134,16 @@ abstract class _Node {
     }
 
     activate() {
-        if(this.editor.view.activeNode){
-            this.editor.view.activeNode.element.classList.remove(classes.nodeActive);
-            this.editor.view.activeNode.active = false;
-            this.editor.view.activeNode = null;
-        }
-        this.element.classList.add(classes.nodeActive);
-        this.active = true;
-        this.editor.view.activeNode = this;
-        this.editor.info.update();
+        this.editor.selectedGraph?.activateNode(this);
     }
 
     select() {
-        if(!this.editor.view.selectedNodes.includes(this)) this.editor.view.selectedNodes.push(this);
-        this.element.classList.add(classes.nodeSelected);
-        this.selected = true;
+        this.editor.selectedGraph?.selectNode(this);
     }
 
     selectCheck() {
-        if(!this.editor.view.keyboardState.shift){
-            this.editor.view.selectedNodes.forEach(node => {
-                node.element.classList.remove(classes.nodeSelected);
-                node.selected = false;
-            });
-            this.editor.view.selectedNodes = [];
+        if (!this.editor.keyboardController.keyboardState.shift) {
+            this.editor.selectedGraph?.deselectNodes();
         }
     }
 
@@ -173,7 +154,6 @@ abstract class _Node {
         ];
         this.element.style.left = this.nodeBox.pos[0] + 'px';
         this.element.style.top = this.nodeBox.pos[1] + 'px';
-        // this.updateConnections();
         this.moveConnections(deltaX, deltaY);
     }
 
@@ -223,7 +203,9 @@ abstract class _Node {
     }
 
     private setupLeftHandle() {
-        const leftHandle = <HTMLElement>this.element.children[0];
+        const leftHandle = document.createElement('div');
+        leftHandle.className = classes.handleLeft;
+        this.element.appendChild(leftHandle);
 
         leftHandle.onmousedown = (e) => {
             e.stopPropagation();
@@ -231,8 +213,8 @@ abstract class _Node {
 
             (<HTMLElement>document.activeElement).blur();
 
-            this.editor.view.offsetX = (this.editor.view.scrollX - this.editor.view.container.getBoundingClientRect().left)/this.editor.view.zoom;
-            this.editor.view.offsetY = (this.editor.view.scrollY - this.editor.view.container.getBoundingClientRect().top)/this.editor.view.zoom;
+            this.editor.view.offsetX = (this.editor.view.scrollX - this.editor.view.container.getBoundingClientRect().left) / this.editor.view.zoom;
+            this.editor.view.offsetY = (this.editor.view.scrollY - this.editor.view.container.getBoundingClientRect().top) / this.editor.view.zoom;
 
             let clientX:number;
             this.editor.view.container.onmousemove = (e) => {
@@ -259,7 +241,10 @@ abstract class _Node {
     }
 
     private setupRightHandle() {
-        const rightHandle = <HTMLElement>this.element.children[1];
+
+        const rightHandle = document.createElement('div');
+        rightHandle.className = classes.handleRight;
+        this.element.appendChild(rightHandle);
 
         rightHandle.onmousedown = (e) => {
             e.stopPropagation();
@@ -267,8 +252,8 @@ abstract class _Node {
 
             (<HTMLElement>document.activeElement).blur();
 
-            this.editor.view.offsetX = (this.editor.view.scrollX - this.editor.view.container.getBoundingClientRect().left)/this.editor.view.zoom;
-            this.editor.view.offsetY = (this.editor.view.scrollY - this.editor.view.container.getBoundingClientRect().top)/this.editor.view.zoom;
+            this.editor.view.offsetX = (this.editor.view.scrollX - this.editor.view.container.getBoundingClientRect().left) / this.editor.view.zoom;
+            this.editor.view.offsetY = (this.editor.view.scrollY - this.editor.view.container.getBoundingClientRect().top) / this.editor.view.zoom;
 
             let clientX:number;
             this.editor.view.container.onmousemove = (e) => {
@@ -291,16 +276,16 @@ abstract class _Node {
 
     private updateConnections() {
         this.connections.forEach(connection => {
-            if(connection.input.node === this){
+            if (connection.input.node === this) {
                 connection.getInputPos();
-            }else if(connection.output.node === this){
+            } else if (connection.output.node === this) {
                 connection.getOutputPos();
             }
         })
         this.connections.forEach(connection => {
-            if(connection.input.node === this){
+            if (connection.input.node === this) {
                 connection.setInputPos();
-            }else if(connection.output.node === this){
+            } else if (connection.output.node === this) {
                 connection.setOutputPos();
             }
         });
@@ -308,13 +293,13 @@ abstract class _Node {
 
     private moveConnections(deltaX:number, deltaY:number) {
         this.connections.forEach(connection => {
-            if(connection.input.node === this){
+            if (connection.input.node === this) {
                 connection.moveInputPos(deltaX, deltaY);
-            }else if(connection.output.node === this){
+            } else if (connection.output.node === this) {
                 connection.moveOutputPos(deltaX, deltaY);
             }
         })
     }
 }
 
-export default _Node;
+export default Node;

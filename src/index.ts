@@ -1,23 +1,27 @@
-import _Input, {_InputBoolean, _InputFloat, _InputNumber, _InputString} from './Input';
-import _Output from './Output';
-import _Node from './Node';
-import _Graph from './Graph';
-import _Editor from './Editor';
-import _Engine from './Engine';
+import Input from './Input';
+import InputNumber from './InputNumber';
+import InputFloat from './InputFloat';
+import InputBoolean from './InputBoolean';
+import InputString from './InputString';
+import Output from './Output';
+import Node from './Node';
+import Graph from './Graph';
+import Editor from './Editor';
+import Engine from './Engine';
 import {setup} from './config';
 
 
 const TSNodes = {
-    Input: _Input,
-    Output: _Output,
-    Node: _Node,
-    Graph: _Graph,
-    Editor: _Editor,
-    Engine: _Engine,
-    InputNumber: _InputNumber,
-    InputFloat: _InputFloat,
-    InputBoolean: _InputBoolean,
-    InputString: _InputString,
+    Input,
+    Output,
+    Node,
+    Graph,
+    Editor,
+    Engine,
+    InputNumber,
+    InputFloat,
+    InputBoolean,
+    InputString,
     setup,
 }
 

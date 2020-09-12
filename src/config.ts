@@ -1,14 +1,16 @@
 import {updateStyles} from './jssBase';
+import {defaultKeyboardShortcuts, KeyboardShortcuts} from './configKeyboardShortcuts';
 
 export interface Config {
-    defaultCanvasWidth?: number,
-    defaultCanvasHeight?: number,
-    zoomMin?: number,
-    zoomMax?: number,
-    defaultNodeWidth?: number,
-    minNodeWidth?: number,
-    maxNodeWidth?: number,
-    debug?: boolean,
+    defaultCanvasWidth?:number,
+    defaultCanvasHeight?:number,
+    zoomMin?:number,
+    zoomMax?:number,
+    defaultNodeWidth?:number,
+    minNodeWidth?:number,
+    maxNodeWidth?:number,
+    debug?:boolean,
+    keyboardShortcuts?:KeyboardShortcuts,
 }
 
 const defaultConfig = {
@@ -20,6 +22,7 @@ const defaultConfig = {
     minNodeWidth: 100,
     maxNodeWidth: 240,
     debug: true,
+    keyboardShortcuts: defaultKeyboardShortcuts,
 }
 
 

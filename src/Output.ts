@@ -1,26 +1,25 @@
-import config from './config';
-import _Node from './Node';
-import _Connection from './Connection';
+import Node from './Node';
+import Connection from './Connection';
 
 import classes from './jssBase';
 
 
-export type _OutputFn<T> = (inputs:any[]) => T;
+export type OutputFn<T> = (inputs:any[]) => T;
 
 interface outputValue<T> {
     index:number,
     value:T,
 }
 
-class _Output<T> {
+class Output<T> {
     public name:string;
-    public fn:_OutputFn<T>;
+    public fn:OutputFn<T>;
     public element:HTMLElement;
-    public node?:_Node;
+    public node?:Node;
     public snap?:HTMLElement;
     public value?:outputValue<T>;
 
-    constructor(name:string, fn:_OutputFn<T>, private visible:boolean = true) {
+    constructor(name:string, fn:OutputFn<T>, private visible:boolean = true) {
         this.name = name;
         this.fn = fn;
         this.element = document.createElement('div');
@@ -54,27 +53,27 @@ class _Output<T> {
             foregroundState.output = this;
             foregroundState.input = null;
             foregroundState.line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-            foregroundState.line.setAttribute('x1', (this.snap.getBoundingClientRect().left + 8*view.zoom - foreground.getBoundingClientRect().left).toString());
-            foregroundState.line.setAttribute('y1', (this.snap.getBoundingClientRect().top + 8*view.zoom  - foreground.getBoundingClientRect().top).toString());
+            foregroundState.line.setAttribute('x1', (this.snap.getBoundingClientRect().left + 8 * view.zoom - foreground.getBoundingClientRect().left).toString());
+            foregroundState.line.setAttribute('y1', (this.snap.getBoundingClientRect().top + 8 * view.zoom - foreground.getBoundingClientRect().top).toString());
             foregroundState.line.setAttribute('x2', (e.clientX - foreground.getBoundingClientRect().left).toString());
             foregroundState.line.setAttribute('y2', (e.clientY - foreground.getBoundingClientRect().top).toString());
             foreground.appendChild(foregroundState.line);
             view.container.onmousemove = (e) => {
                 if (!this.node || !this.snap || !foregroundState.line) return;
                 foregroundState.input = null;
-                foregroundState.line.setAttribute('x1', (this.snap.getBoundingClientRect().left + 8*view.zoom - foreground.getBoundingClientRect().left).toString());
-                foregroundState.line.setAttribute('y1', (this.snap.getBoundingClientRect().top + 8*view.zoom  - foreground.getBoundingClientRect().top).toString());
+                foregroundState.line.setAttribute('x1', (this.snap.getBoundingClientRect().left + 8 * view.zoom - foreground.getBoundingClientRect().left).toString());
+                foregroundState.line.setAttribute('y1', (this.snap.getBoundingClientRect().top + 8 * view.zoom - foreground.getBoundingClientRect().top).toString());
                 foregroundState.line.setAttribute('x2', (e.clientX - foreground.getBoundingClientRect().left).toString());
                 foregroundState.line.setAttribute('y2', (e.clientY - foreground.getBoundingClientRect().top).toString());
             }
             view.container.onmouseup = (e) => {
-                if(foregroundState.input && foregroundState.output){
-                    const connection = new _Connection(foregroundState.output, foregroundState.input);
-                    view.createConnection(connection);
+                if (foregroundState.input && foregroundState.output) {
+                    const connection = new Connection(foregroundState.output, foregroundState.input);
+                    this.node?.editor.selectedGraph?.createConnection(connection);
                 }
                 foregroundState.line?.remove();
                 foregroundState.line = null;
-                if(this.node) this.node.editor.view.move = false;
+                if (this.node) this.node.editor.view.move = false;
                 foregroundState.active = false;
                 foregroundState.input = null;
                 foregroundState.output = null;
@@ -90,19 +89,19 @@ class _Output<T> {
             const view = this.node.editor.view;
             const foregroundState = this.node.editor.view.foregroundState;
             const foreground = this.node.editor.view.foreground;
-            if(foregroundState.active && foregroundState.line && foregroundState.output === null && foregroundState.input?.node !== this.node){
+            if (foregroundState.active && foregroundState.line && foregroundState.output === null && foregroundState.input?.node !== this.node) {
                 // e.stopPropagation();
                 foregroundState.output = this;
-                foregroundState.line.setAttribute('x2', (this.snap.getBoundingClientRect().left + 8*view.zoom - foreground.getBoundingClientRect().left).toString());
-                foregroundState.line.setAttribute('y2', (this.snap.getBoundingClientRect().top + 8*view.zoom  - foreground.getBoundingClientRect().top).toString());
+                foregroundState.line.setAttribute('x2', (this.snap.getBoundingClientRect().left + 8 * view.zoom - foreground.getBoundingClientRect().left).toString());
+                foregroundState.line.setAttribute('y2', (this.snap.getBoundingClientRect().top + 8 * view.zoom - foreground.getBoundingClientRect().top).toString());
             }
         }
     }
 
     render():HTMLElement {
-        if(!this.visible) return document.createElement('div');
+        if (!this.visible) return document.createElement('div');
         return this.element;
     }
 }
 
-export default _Output;
+export default Output;

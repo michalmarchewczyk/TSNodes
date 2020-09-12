@@ -3,12 +3,10 @@
 }
 
 .TSNodes_canvas {
-  background:
-  linear-gradient(to right, #525252 2px, transparent 1px) 0 0 / 80px 80px,
+  background: linear-gradient(to right, #525252 2px, transparent 1px) 0 0 / 80px 80px,
   linear-gradient(#525252 2px, transparent 1px) 0 0 / 80px 80px,
   linear-gradient(to right, #4a4a4a 1px, transparent 1px) 0 0 / 20px 20px,
-  linear-gradient(#4a4a4a 1px, transparent 1px) 0 0 / 20px 20px
-  #444444;
+  linear-gradient(#4a4a4a 1px, transparent 1px) 0 0 / 20px 20px #444444;
 }
 
 .TSNodes_nodeElement {
@@ -19,8 +17,9 @@
   padding: 5px;
   width: calc(100% - 20px);
   height: 20px;
-  box-shadow: 1px 1px 3px rgba(0,0,0,0.4);
+  box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.4);
   cursor: pointer;
+
   &:hover {
     background: lighten(#444444, 20);
   }
@@ -29,13 +28,14 @@
 .TSNodes_graphElement {
   background: lighten(#444444, 10);
   border-radius: 4px;
-  color: rgba(255,255,255,0.7);
+  color: rgba(255, 255, 255, 0.7);
   margin: 5px;
   padding: 5px;
   width: calc(100% - 20px);
   height: 20px;
-  box-shadow: 1px 1px 3px rgba(0,0,0,0.4);
+  box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.4);
   cursor: pointer;
+
   &:hover {
     background: lighten(#444444, 20);
   }
@@ -47,8 +47,8 @@
 }
 
 .TSNodes_selectBox {
-  border: 1px dashed rgba(255,255,255,0.7);
-  background: rgba(255,255,255,0.04);
+  border: 1px dashed rgba(255, 255, 255, 0.7);
+  background: rgba(255, 255, 255, 0.04);
 }
 
 .TSNodes_contextMenu {
@@ -57,9 +57,10 @@
   overflow: hidden;
   padding-top: 6px;
   padding-bottom: 6px;
-  box-shadow: 1px 1px 6px 0 rgba(0,0,0,0.2);
+  box-shadow: 1px 1px 6px 0 rgba(0, 0, 0, 0.2);
+
   button {
-    background: rgba(0,0,0,0);
+    background: rgba(0, 0, 0, 0);
     color: white;
     border: none;
     outline: none;
@@ -67,21 +68,25 @@
     text-align: left;
     padding: 8px 8px 8px 12px;
     cursor: pointer;
+
     &:hover {
-      background: rgba(0,0,0,0.4);
+      background: rgba(0, 0, 0, 0.4);
     }
   }
 }
 
 .TSNodes_graphInfo {
   background: #888888;
+
   label {
     display: block;
     padding-top: 6px;
+
     span {
       margin-left: 6px;
       color: white;
     }
+
     input {
       background: #505050;
       color: white;
@@ -95,11 +100,13 @@
       height: 24px;
       margin-top: 4px;
       margin-bottom: 4px;
+
       &:focus {
         background: darken(#505050, 8);
       }
     }
   }
+
   button {
     background: lighten(#444444, 10);
     border-radius: 4px;
@@ -108,13 +115,14 @@
     padding: 5px;
     width: calc(100% - 10px);
     height: 20px;
-    box-shadow: 1px 1px 3px rgba(0,0,0,0.4);
+    box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.4);
     cursor: pointer;
     outline: none;
     border: none;
     font-size: 16px;
     padding-bottom: 22px;
     margin-bottom: 10px;
+
     &:hover {
       background: lighten(#444444, 20);
     }
@@ -123,13 +131,16 @@
 
 .TSNodes_nodeInfo {
   background: #888888;
+
   label {
     display: block;
     padding-top: 6px;
+
     span {
       margin-left: 6px;
       color: white;
     }
+
     input {
       background: #505050;
       color: white;
@@ -143,11 +154,13 @@
       height: 24px;
       margin-top: 4px;
       margin-bottom: 4px;
+
       &:focus {
         background: darken(#505050, 8);
       }
     }
   }
+
   button {
     background: lighten(#444444, 10);
     border-radius: 4px;
@@ -156,13 +169,14 @@
     padding: 5px;
     width: calc(100% - 10px);
     height: 20px;
-    box-shadow: 1px 1px 3px rgba(0,0,0,0.4);
+    box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.4);
     cursor: pointer;
     outline: none;
     border: none;
     font-size: 16px;
     padding-bottom: 22px;
     margin-bottom: 10px;
+
     &:hover {
       background: lighten(#444444, 20);
     }
@@ -171,8 +185,8 @@
 
 .TSNodes_node {
   border-radius: 4px;
-  box-shadow: 1px 1px 5px rgba(0,0,0,0.2);
-  background: rgba(119,119,119,0.8);
+  box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.2);
+  background: rgba(119, 119, 119, 0.8);
   border: 2px solid transparent;
 }
 
@@ -182,6 +196,7 @@
     min-height: 25px;
     height: 25px;
     padding: 2px;
+
     button {
       top: -5px;
     }
@@ -216,6 +231,7 @@
   height: 20px;
   max-height: 20px;
   margin: 6px 0;
+
   span {
     color: white;
     font-size: 14px;
@@ -254,7 +270,7 @@
   height: 8px;
   background: #eeeeee;
   border-radius: 4px;
-  box-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+  box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
 }
 
 .TSNodes_outputDot {
@@ -264,7 +280,7 @@
   height: 8px;
   background: #eeeeee;
   border-radius: 4px;
-  box-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+  box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
 }
 
 .TSNodes_fieldElement {
@@ -272,12 +288,14 @@
   color: white;
   font-size: 14px;
   line-height: 20px;
+
   input {
     background: #505050;
     color: white;
     font-size: 14px;
     border-radius: 3px;
     text-indent: 2px;
+
     &:focus {
       background: darken(#505050, 8);
     }
@@ -289,39 +307,50 @@
   color: white;
   font-size: 14px;
   line-height: 20px;
+
   div {
     background: #505050;
     border-radius: 3px;
+
     button:first-child, button:last-child {
       background: lighten(#505050, 6);
+
       &:hover {
         background: lighten(#505050, 4);
       }
+
       &:first-child::before {
         border-color: transparent #aaaaaa transparent transparent;
       }
+
       &:last-child::before {
         border-color: transparent transparent transparent #aaaaaa;
       }
     }
+
     span {
       padding-left: 4px;
       padding-right: 2px;
+
       &::after {
         content: ":";
       }
     }
+
     input {
       color: white;
       font-size: 14px;
       text-indent: 2px;
       background: #505050;
+
       &:focus {
         background: darken(#505050, 8);
       }
     }
+
     &:focus-within {
       background: darken(#505050, 8);
+
       span {
         display: none;
       }
@@ -334,6 +363,7 @@
   color: white;
   font-size: 14px;
   line-height: 20px;
+
   input {
     //background: #505050;
     color: white;
@@ -347,6 +377,7 @@
     outline: none;
     max-width: 2px;
     margin-left: 0;
+
     &::before {
       content: "";
       display: block;
@@ -359,6 +390,7 @@
       border: 4px solid #505050;
       border-radius: 3px;
     }
+
     &:checked {
       &::after {
         content: "";

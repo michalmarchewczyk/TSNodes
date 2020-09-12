@@ -9,7 +9,8 @@
         "no-angle-bracket-type-assertion": false,
         "no-shadowed-variable": false,
         "max-classes-per-file": false,
-        "no-console": true
+        "no-console": true,
+        "comment-type": [true]
     },
     "rulesDirectory": []
 }

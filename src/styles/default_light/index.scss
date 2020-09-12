@@ -3,17 +3,15 @@
 }
 
 .TSNodes_canvas {
-  background:
-          linear-gradient(to right, #d6d6d6 2px, transparent 1px) 0 0 / 80px 80px,
-          linear-gradient(#d6d6d6 2px, transparent 1px) 0 0 / 80px 80px,
-          linear-gradient(to right, #dddddd 1px, transparent 1px) 0 0 / 20px 20px,
-          linear-gradient(#dddddd 1px, transparent 1px) 0 0 / 20px 20px
-          #e6e6e6;
+  background: linear-gradient(to right, #d6d6d6 2px, transparent 1px) 0 0 / 80px 80px,
+  linear-gradient(#d6d6d6 2px, transparent 1px) 0 0 / 80px 80px,
+  linear-gradient(to right, #dddddd 1px, transparent 1px) 0 0 / 20px 20px,
+  linear-gradient(#dddddd 1px, transparent 1px) 0 0 / 20px 20px #e6e6e6;
 }
 
 .TSNodes_background {
   line {
-    stroke: rgba(0,0,0,0.7);
+    stroke: rgba(0, 0, 0, 0.7);
   }
 }
 
@@ -22,6 +20,7 @@
     stroke: #000000;
   }
 }
+
 .TSNodes_nodeElement {
   background: #e8e8e8;
   border-radius: 4px;
@@ -30,8 +29,9 @@
   padding: 5px;
   width: calc(100% - 20px);
   height: 20px;
-  box-shadow: 1px 1px 3px rgba(0,0,0,0.4);
+  box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.4);
   cursor: pointer;
+
   &:hover {
     background: darken(#e8e8e8, 10);
   }
@@ -40,13 +40,14 @@
 .TSNodes_graphElement {
   background: #e8e8e8;
   border-radius: 4px;
-  color: rgba(0,0,0,0.7);
+  color: rgba(0, 0, 0, 0.7);
   margin: 5px;
   padding: 5px;
   width: calc(100% - 20px);
   height: 20px;
-  box-shadow: 1px 1px 3px rgba(0,0,0,0.4);
+  box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.4);
   cursor: pointer;
+
   &:hover {
     background: darken(#e8e8e8, 10);
   }
@@ -58,8 +59,8 @@
 }
 
 .TSNodes_selectBox {
-  border: 1px dashed rgba(0,0,0,0.7);
-  background: rgba(0,0,0,0.04);
+  border: 1px dashed rgba(0, 0, 0, 0.7);
+  background: rgba(0, 0, 0, 0.04);
 }
 
 .TSNodes_contextMenu {
@@ -68,9 +69,10 @@
   overflow: hidden;
   padding-top: 6px;
   padding-bottom: 6px;
-  box-shadow: 1px 1px 6px 0 rgba(0,0,0,0.2);
+  box-shadow: 1px 1px 6px 0 rgba(0, 0, 0, 0.2);
+
   button {
-    background: rgba(0,0,0,0);
+    background: rgba(0, 0, 0, 0);
     color: black;
     border: none;
     outline: none;
@@ -78,21 +80,25 @@
     text-align: left;
     padding: 8px 8px 8px 12px;
     cursor: pointer;
+
     &:hover {
-      background: rgba(0,0,0,0.1);
+      background: rgba(0, 0, 0, 0.1);
     }
   }
 }
 
 .TSNodes_graphInfo {
   background: #eeeeee;
+
   label {
     display: block;
     padding-top: 6px;
+
     span {
       margin-left: 6px;
       color: black;
     }
+
     input {
       background: #d6d6d6;
       color: black;
@@ -106,26 +112,29 @@
       height: 24px;
       margin-top: 4px;
       margin-bottom: 4px;
+
       &:focus {
         background: darken(#d6d6d6, 8);
       }
     }
   }
+
   button {
     background: #e8e8e8;
     border-radius: 4px;
-    color: rgba(0,0,0,0.7);
+    color: rgba(0, 0, 0, 0.7);
     margin: 5px;
     padding: 5px;
     width: calc(100% - 10px);
     height: 20px;
-    box-shadow: 1px 1px 3px rgba(0,0,0,0.4);
+    box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.4);
     cursor: pointer;
     outline: none;
     border: none;
     font-size: 16px;
     padding-bottom: 22px;
     margin-bottom: 10px;
+
     &:hover {
       background: darken(#e8e8e8, 10);
     }
@@ -134,13 +143,16 @@
 
 .TSNodes_nodeInfo {
   background: #eeeeee;
+
   label {
     display: block;
     padding-top: 6px;
+
     span {
       margin-left: 6px;
       color: black;
     }
+
     input {
       background: #d6d6d6;
       color: black;
@@ -154,26 +166,29 @@
       height: 24px;
       margin-top: 4px;
       margin-bottom: 4px;
+
       &:focus {
         background: darken(#d6d6d6, 8);
       }
     }
   }
+
   button {
     background: #e8e8e8;
     border-radius: 4px;
-    color: rgba(0,0,0,0.7);
+    color: rgba(0, 0, 0, 0.7);
     margin: 5px;
     padding: 5px;
     width: calc(100% - 10px);
     height: 20px;
-    box-shadow: 1px 1px 3px rgba(0,0,0,0.4);
+    box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.4);
     cursor: pointer;
     outline: none;
     border: none;
     font-size: 16px;
     padding-bottom: 22px;
     margin-bottom: 10px;
+
     &:hover {
       background: darken(#e8e8e8, 10);
     }
@@ -182,7 +197,7 @@
 
 .TSNodes_node {
   border-radius: 4px;
-  box-shadow: 1px 1px 5px rgba(0,0,0,0.2);
+  box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.2);
   background: rgba(250, 250, 250, 0.8);
   border: 2px solid transparent;
 }
@@ -193,6 +208,7 @@
     min-height: 25px;
     height: 25px;
     padding: 2px;
+
     button {
       top: -5px;
       border-color: transparent transparent transparent black;
@@ -216,6 +232,7 @@
   line-height: 20px;
   background: #e2e2e2;
   color: #000000;
+
   button {
     border-color: black transparent transparent transparent;
   }
@@ -231,6 +248,7 @@
   height: 20px;
   max-height: 20px;
   margin: 6px 0;
+
   span {
     color: black;
     font-size: 14px;
@@ -269,7 +287,7 @@
   height: 8px;
   background: #555555;
   border-radius: 4px;
-  box-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+  box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
 }
 
 .TSNodes_outputDot {
@@ -279,7 +297,7 @@
   height: 8px;
   background: #555555;
   border-radius: 4px;
-  box-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+  box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
 }
 
 .TSNodes_fieldElement {
@@ -287,12 +305,14 @@
   color: #292940;
   font-size: 14px;
   line-height: 20px;
+
   input {
     background: #d6d6d6;
     color: black;
     font-size: 14px;
     border-radius: 3px;
     text-indent: 2px;
+
     &:focus {
       background: darken(#d6d6d6, 8);
     }
@@ -304,39 +324,50 @@
   color: white;
   font-size: 14px;
   line-height: 20px;
+
   div {
     background: #d6d6d6;
     border-radius: 3px;
+
     button:first-child, button:last-child {
       background: darken(#d6d6d6, 10);
+
       &:hover {
         background: darken(#d6d6d6, 12);
       }
+
       &:first-child::before {
         border-color: transparent #777777 transparent transparent;
       }
+
       &:last-child::before {
         border-color: transparent transparent transparent #777777;
       }
     }
+
     span {
       padding-left: 4px;
       padding-right: 2px;
+
       &::after {
         content: ":";
       }
     }
+
     input {
       color: black;
       font-size: 14px;
       text-indent: 2px;
       background: #d6d6d6;
+
       &:focus {
         background: darken(#d6d6d6, 8);
       }
     }
+
     &:focus-within {
       background: darken(#d6d6d6, 8);
+
       span {
         display: none;
       }
@@ -349,6 +380,7 @@
   color: white;
   font-size: 14px;
   line-height: 20px;
+
   input {
     color: white;
     font-size: 14px;
@@ -361,6 +393,7 @@
     outline: none;
     max-width: 2px;
     margin-left: 0;
+
     &::before {
       content: "";
       display: block;
@@ -373,6 +406,7 @@
       border: 4px solid #d6d6d6;
       border-radius: 3px;
     }
+
     &:checked {
       &::after {
         content: "";
