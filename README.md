@@ -112,7 +112,7 @@ An open source TypeScript/JavaScript library for creating visual programming int
     }
     ```
    
-1. Adding outputs to node type
+1. Adding outputs to node type  
     To add outputs to node type expand node constructor by adding `this.output(args)` calls or `this.addOutput(new TSNodes.Output())` calls.
     ```javascript
     class node1 extends TSNodes.Node {
