@@ -1,4 +1,4 @@
-# TSNodes
+# [DEPRECATED] TSNodes
 
 An open source TypeScript/JavaScript library for creating visual programming interfaces.
 
